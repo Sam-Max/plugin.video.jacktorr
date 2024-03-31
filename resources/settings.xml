@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="$INFO[System.AddonTitle(Window.Property(Addon.ID))]">
+        <setting id="has_libtorrest" type="bool" default="false" visible="false"/>
+        <setting id="service_enabled" type="bool" label="30059" default="true"/>
+        <setting id="timeout" type="number" label="30002" default="20" enable="eq(-1,true)" subsetting="true"/>
+        <setting id="force_torrest" type="bool" label="30085" default="false" subsetting="true"
+                 enable="eq(-2,true)" visible="eq(-3,true)"/>
+        <setting id="service_ip" type="ipaddress" label="30060" default="127.0.0.1" enable="eq(-3,false)"/>
+        <setting id="port" type="number" label="30001" default="61235"/>
+        <setting id="files_order" type="enum" label="30064" default="0" lvalues="30065|30066|30067"/>
+        <setting id="overlay" type="bool" label="30004" default="true"/>
+        <setting id="metadata_timeout" type="slider" label="30081" option="int" range="0,10,120" default="30"/>
+        <setting id="buffer_timeout" type="slider" label="30003" option="int" range="0,30,600" default="300"/>
+        <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
+        <setting id="ask_to_delete" type="bool" label="30056" default="true"/>
+        <setting id="show_bg_progress" type="bool" label="30068" default="true"/>
+        <setting id="download_after_insert" type="bool" label="30062" default="false"/>
+        <setting id="migrated" type="bool" visible="false" default="false"/>
+    </category>
+    <!-- General -->
+    <category label="30000">
+        <setting id="s:download_path" type="folder" source="auto" option="writeable" label="30010"
+                 default="special://userdata/addon_data/plugin.video.torrest/downloads"/>
+        <setting id="s:torrents_path" type="folder" source="auto" option="writeable" label="30079"
+                 default="special://userdata/addon_data/plugin.video.torrest/torrents"/>
+        <setting id="s:buffer_size" type="number" label="30012" default="20971520"/>
+        <setting id="s:listen_port" type="number" label="30013" default="6889"/>
+        <setting id="s:listen_interfaces" type="text" label="30014" default=""/>
+        <setting id="s:outgoing_interfaces" type="text" label="30015" default=""/>
+        <setting id="s:user_agent" type="text" label="30018" default=""/>
+        <setting id="s:disable_dht" type="bool" label="30016" default="false"/>
+        <setting id="s:disable_upnp" type="bool" label="30017" default="false"/>
+        <setting id="s:disable_natpmp" type="bool" label="30069" default="false"/>
+        <setting id="s:disable_lsd" type="bool" label="30070" default="false"/>
+        <setting id="s:session_save" type="slider" label="30031" option="int" range="10,10,120" default="30"/>
+        <setting id="s:tuned_storage" type="bool" label="30032" default="false"/>
+        <setting id="s:check_available_space" type="bool" label="30080" default="true"/>
+        <!-- Encryption policy: Enabled | Disabled | Forced -->
+        <setting id="s:encryption_policy" type="enum" label="30039" lvalues="30040|30041|30042"/>
+        <setting id="s:service_log_level" type="enum" label="30057" values="TRACE|DEBUG|INFO|WARNING|ERROR|CRITICAL|OFF"
+                 default="2"/> <!-- default INFO -->
+        <setting id="s:alerts_log_level" type="enum" label="30058" values="TRACE|DEBUG|INFO|WARNING|ERROR|CRITICAL|OFF"
+                 default="5"/> <!-- default CRITICAL -->
+        <setting id="s:api_log_level" type="enum" label="30082" values="TRACE|DEBUG|INFO|WARNING|ERROR|CRITICAL|OFF"
+                 default="4"/> <!-- default ERROR -->
+    </category>
+    <!-- Limits -->
+    <category label="30078">
+        <setting id="s:connections_limit" type="number" label="30011" default="0"/>
+        <setting id="s:piece_wait_timeout" type="slider" label="30063" option="int" range="0,10,120" default="60"/>
+        <setting id="s:piece_expiration" type="slider" label="30084" option="int" range="5,5,120" default="5"/>
+        <setting id="s:limit_after_buffering" type="bool" label="30033" default="false"/>
+        <setting id="s:max_download_rate" type="number" label="30034" default="0"/>
+        <setting id="s:max_upload_rate" type="number" label="30035" default="0"/>
+        <setting id="s:share_ratio_limit" type="number" label="30036" default="0"/>
+        <setting id="s:seed_time_ratio_limit" type="number" label="30037" default="0"/>
+        <setting id="s:seed_time_limit" type="number" label="30038" default="0"/>
+        <setting id="s:active_downloads_limit" type="number" label="30071" default="3"/>
+        <setting id="s:active_seeds_limit" type="number" label="30072" default="5"/>
+        <setting id="s:active_checking_limit" type="number" label="30073" default="1"/>
+        <setting id="s:active_dht_limit" type="number" label="30074" default="88"/>
+        <setting id="s:active_tracker_limit" type="number" label="30075" default="1600"/>
+        <setting id="s:active_lsd_limit" type="number" label="30076" default="60"/>
+        <setting id="s:active_limit" type="number" label="30077" default="500"/>
+    </category>
+    <!-- Proxy -->
+    <category label="30043">
+        <!-- Proxy type: NONE | SOCKS4 | SOCKS5 | SOCKS5_PASSWORD | HTTP | HTTP_PASSWORD | I2PSAM -->
+        <setting id="s:proxy:type" type="enum" label="30044" default="0"
+                 lvalues="30061|30045|30046|30047|30048|30049|30050"/>
+        <setting id="s:proxy:hostname" type="text" label="30051" default="" enable="!eq(-1,0)" subsetting="true"/>
+        <setting id="s:proxy:port" type="number" label="30052" default="1080" enable="!eq(-2,0)" subsetting="true"/>
+        <setting id="s:proxy:username" type="text" label="30053" default="" enable="!eq(-3,0)" subsetting="true"/>
+        <setting id="s:proxy:password" type="text" label="30054" default="" option="hidden" enable="!eq(-4,0)"
+                 subsetting="true"/>
+    </category>
+</settings>
