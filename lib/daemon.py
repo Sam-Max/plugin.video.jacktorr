@@ -201,13 +201,13 @@ class Daemon(object):
     def daemon_running(self):
         return self._p is not None and self._p.poll() is None
 
-    def start_logger(self, level=logging.INFO, path=None):
+    def start_logger(self, level=logging.INFO, logpath=None):
         if self._logger is not None:
             raise ValueError("logger was already started")
         if self._p is None:
             raise ValueError("no process to log")
         logging.info("Starting daemon logger")
-        self._logger = DaemonLogger(self._p.stdout, default_level=level, path=path)
+        self._logger = DaemonLogger(self._p.stdout, default_level=level, path=logpath)
         self._logger.start()
 
     def stop_logger(self):
