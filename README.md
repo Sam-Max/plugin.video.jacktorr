@@ -1,41 +1,19 @@
-# plugin.video.torrest
+# plugin.video.jacktorr
 
-[![Build Status](https://github.com/i96751414/plugin.video.torrest/workflows/build/badge.svg)](https://github.com/i96751414/plugin.video.torrest/actions?query=workflow%3Abuild)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/02d656339d9e4d8fb3ced0211c34c9b4)](https://www.codacy.com/gh/i96751414/plugin.video.torrest/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=i96751414/plugin.video.torrest&amp;utm_campaign=Badge_Grade)
+Jacktorr is an streaming engine for Kodi, which uses the [TorrServer](https://github.com/YouROK/TorrServer), which provides several features like an http API for streaming, cache size adjustment, etc
 
-Another torrent streaming engine for Kodi. It uses the [torrest service](https://github.com/i96751414/torrest-cpp), which
-provides an API specially made for streaming.
-
-## Supported platforms
-
--   Windows 32/64 bits (starting Vista)
--   Linux 32/64 bits
--   Linux ARM (ARMv7 and ARM64)
--   OS X 64 bits
--   Android (5.x and later) ARM, x86 and x64
-
-Minimum supported Kodi version: 16 (Jarvis)
 
 ## Installation
 
-The recommended way of installing this addon is through its [repository](https://github.com/i96751414/repository.github#installation).
-This way, any updates will be automatically installed.
+To install the addon, get the [latest release](https://github.com/Sam-Max/plugin.video.jacktorr/releases/latest) from github.
+**Do NOT use the `Download ZIP` button on this page.** 
 
-Although **not recommended**, one can install the addon without installing its repository. To do so, get the
-[latest release](https://github.com/i96751414/plugin.video.torrest/releases/latest) from github.
-**Do NOT use the `Download ZIP` button on this page.** Please note that, if there are any additional dependencies, they
-won't be resolved unless the repository is installed.
+## Calling jacktorr from other addon
 
-## Calling torrest from other addon
-
-One can call torrest from other addons. To do so, simply use torrest API:
+One can call jacktorr from other addons. To do so, simply use jacktorr API:
 
 |Url|Description|
 |---|-----------|
-|`plugin://plugin.video.torrest/play_magnet?magnet=<magnet>`|Plays the provided `<magnet>`|
-|`plugin://plugin.video.torrest/play_url?url=<url>`|Plays the provided torrent file `<url>`|
-|`plugin://plugin.video.torrest/play_path?path=<path>`|Plays the provided torrent file path `<path>`|
-
-## Screenshots
-
-![screenshots](resources/screenshots/screenshots.gif)
+|`plugin://plugin.video.jacktorr/play_magnet?magnet=<magnet>`|Plays the provided `<magnet>`|
+|`plugin://plugin.video.jacktorr/play_url?url=<url>`|Plays the provided torrent file `<url>`|
+|`plugin://plugin.video.jacktorr/play_path?path=<path>`|Plays the provided torrent file path `<path>`|

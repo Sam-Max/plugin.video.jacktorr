@@ -93,9 +93,9 @@ class Player(object):
         pass
 
 
-class TorrestPlayer(Player):
+class JackTorrPlayer(Player):
     def __init__(self, url=None, text_handler=None, on_close_handler=None):
-        super(TorrestPlayer, self).__init__(url=url)
+        super(JackTorrPlayer, self).__init__(url=url)
         self._stopped = False
         self._text_handler = text_handler
         self._on_close_handler = on_close_handler

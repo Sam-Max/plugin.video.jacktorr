@@ -22,7 +22,7 @@ from lib.kodi import (
     close_busy_dialog,
 )
 from lib.kodi_formats import is_music, is_picture, is_video, is_text
-from lib.player import TorrestPlayer
+from lib.player import JackTorrPlayer
 from lib.settings import (
     get_service_ip,
     get_port,
@@ -486,7 +486,7 @@ def play(info_hash, file_id, path):
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
     setResolvedUrl(plugin.handle, True, ListItem(name, path=serve_url))
 
-    TorrestPlayer(
+    JackTorrPlayer(
         url=serve_url,
         text_handler=(
             (lambda: get_status_labels(info_hash) + (name,))

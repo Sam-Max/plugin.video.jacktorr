@@ -53,9 +53,5 @@ def show_background_progress():
     return get_boolean_setting("show_bg_progress")
 
 
-def set_has_libtorrest(value):
-    set_boolean_setting("has_libtorrest", value)
-
-
-def get_force_torrest():
-    return get_boolean_setting("force_torrest")
+def get_force_jacktorr():
+    return get_boolean_setting("force_jacktorr")

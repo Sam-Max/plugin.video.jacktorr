@@ -1,6 +1,6 @@
 # Kodi Media Center language file
-# Addon Name: Torrest
-# Addon id: plugin.video.torrest
+# Addon Name: JackTorr
+# Addon id: plugin.video.jacktorr
 # Addon Provider: i96751414
 #
 msgid ""
@@ -187,12 +187,12 @@ msgid "Alerts log level"
 msgstr "Nivel de registro de alertas"
 
 msgctxt "#30059"
-msgid "Enable Torrest service"
-msgstr "Habilitar el servicio Torrest"
+msgid "Enable jacktorr service"
+msgstr "Habilitar el servicio Jacktorr"
 
 msgctxt "#30060"
-msgid "Torrest sevice IP address"
-msgstr "Habilitar el servicio Torrest"
+msgid "Jacktorr sevice IP address"
+msgstr "Habilitar el servicio Jacktorr"
 
 msgctxt "#30061"
 msgid "Disabled"
@@ -291,33 +291,33 @@ msgid "Piece expiration time"
 msgstr "Tiempo de caducidad de pieza"
 
 msgctxt "#30085"
-msgid "Force torrest binary - Requires restart"
-msgstr "Forzar binario de torrest - Requiere reiniciar"
+msgid "Force jacktorr binary - Requires restart"
+msgstr "Forzar binario de jacktorr - Requiere reiniciar"
 
 # Service
 msgctxt "#30100"
-msgid "Torrest - first run"
-msgstr "Torrest - primera ejecución"
+msgid "Jacktorr - first run"
+msgstr "Jacktorr - primera ejecución"
 
 msgctxt "#30101"
-msgid "Please set the download path so you can properly use Torrest. Feel free to also change any other settings."
-msgstr "Establezca la ruta de descarga para poder utilizar Torrest correctamente. Siéntase libre también de cambiar cualquier otra configuración."
+msgid "Please set the download path so you can properly use Jacktorr. Feel free to also change any other settings."
+msgstr "Establezca la ruta de descarga para poder utilizar Jacktorr correctamente. Siéntase libre también de cambiar cualquier otra configuración."
 
 msgctxt "#30102"
 msgid "Error..."
 msgstr "Error..."
 
 msgctxt "#30103"
-msgid "Unable to start Torrest service.\nPlease set the service IP address in settings."
-msgstr "No se puede iniciar el servicio Torrest. \nPor favor, configure la dirección IP del servicio en la configuración."
+msgid "Unable to start jacktorr service.\nPlease set the service IP address in settings."
+msgstr "No se puede iniciar el servicio jacktorr. \nPor favor, configure la dirección IP del servicio en la configuración."
 
 msgctxt "#30104"
-msgid "Torrest daemon started"
-msgstr "El demonio Torrest iniciado"
+msgid "Jacktorr daemon started"
+msgstr "El demonio Jacktorr iniciado"
 
 msgctxt "#30105"
-msgid "Torrest daemon crashed"
-msgstr "El demonio de Torrest falló"
+msgid "Jacktorr daemon crashed"
+msgstr "El demonio de Jacktorr falló"
 
 msgctxt "#30106"
 msgid "Total"
