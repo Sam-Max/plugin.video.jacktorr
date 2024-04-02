@@ -1,6 +1,6 @@
 # plugin.video.jacktorr
 
-JackTorr is an streaming engine for Kodi, which uses the [TorrServer](https://github.com/YouROK/TorrServer), which provides several features like an http API, memory(ram) and disk streaming, cache size adjustment, etc
+JackTorr is an torrent streaming engine for Kodi that implements [TorrServer](https://github.com/YouROK/TorrServer), which provides several features like an http API, cache size adjustment, memory and disk streaming, etc
 
 
 ## Installation
