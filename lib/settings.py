@@ -1,8 +1,17 @@
-from lib.kodi import get_int_setting, get_boolean_setting, get_setting, set_boolean_setting
+from lib.kodi import (
+    get_int_setting,
+    get_boolean_setting,
+    get_setting,
+    set_boolean_setting,
+)
+
+
+def get_service_host():
+    return get_setting("service_host")
 
 
 def get_port():
-    return get_int_setting("port")
+    return get_int_setting("service_port")
 
 
 def get_daemon_timeout():
@@ -37,8 +46,16 @@ def set_service_enabled(value):
     set_boolean_setting("service_enabled", value)
 
 
-def get_service_ip():
-    return "127.0.0.1" if service_enabled() else get_setting("service_ip")
+def ssl_enabled():
+    return get_boolean_setting("ssl_connection")
+
+
+def get_username():
+    return get_setting("service_login")
+
+
+def get_password():
+    return get_setting("service_password")
 
 
 def download_after_insert():
@@ -51,7 +68,3 @@ def get_files_order():
 
 def show_background_progress():
     return get_boolean_setting("show_bg_progress")
-
-
-def get_force_jacktorr():
-    return get_boolean_setting("force_jacktorr")

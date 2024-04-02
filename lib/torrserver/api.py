@@ -1,10 +1,16 @@
 import json
 import requests
+from requests.auth import HTTPBasicAuth
 
 
 class TorrServer(object):
-    def __init__(self, host, port, session=None):
-        self._base_url = "http://{}:{}".format(host, port)
+    def __init__(self, host, port, username, password, ssl_enabled=False, session=None):
+        self._base_url = "{}://{}:{}".format(
+            "https" if ssl_enabled else "http", host, port
+        )
+        self._username = username
+        self._password = password
+        self._auth = HTTPBasicAuth(self._username, self._password)
         self._session = session or requests
 
     @property
@@ -122,8 +128,7 @@ class TorrServer(object):
 
     def get_settings(self):
         res = self._post("/settings", data=json.dumps({"action": "get"}))
-        for k, v in res.json().items():
-            print(f"{k}:{v}")
+        return res.json()
 
     def _post(self, url, **kwargs):
         return self._request("post", url, **kwargs)
@@ -138,7 +143,9 @@ class TorrServer(object):
         return self._request("delete", url, **kwargs)
 
     def _request(self, method, url, validate=True, **kwargs):
-        res = self._session.request(method, self._base_url + url, **kwargs)
+        res = self._session.request(
+            method, self._base_url + url, auth=self._auth, **kwargs
+        )
         if validate and res.status_code >= 400:
             raise TorrServerError(res.text)
         return res

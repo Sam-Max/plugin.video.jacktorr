@@ -24,21 +24,27 @@ from lib.kodi import (
 from lib.kodi_formats import is_music, is_picture, is_video, is_text
 from lib.player import JackTorrPlayer
 from lib.settings import (
-    get_service_ip,
+    get_password,
+    get_service_host,
     get_port,
     get_buffering_timeout,
+    get_username,
     show_status_overlay,
     get_min_candidate_size,
     ask_to_delete_torrent,
     get_files_order,
     get_metadata_timeout,
+    ssl_enabled,
 )
 from lib.utils import sizeof_fmt
 
 set_logger()
 plugin = routing.Plugin()
 
-api = TorrServer(get_service_ip(), get_port())
+
+api = TorrServer(
+    get_service_host(), get_port(), get_username(), get_password(), ssl_enabled()
+)
 
 
 class PlayError(Exception):
@@ -144,7 +150,7 @@ def get_status_labels(info_hash):
     return (
         "{:s}".format(get_state_string(info.get("stat"))),
         "D:{:s}/s U:{:s}/s S:{:d} P:{:d}/{:d}".format(
-            sizeof_fmt(info.get("download_speed")), 
+            sizeof_fmt(info.get("download_speed")),
             sizeof_fmt(info.get("upload_speed")),
             info.get("connected_seeders"),
             info.get("active_peers"),
@@ -351,6 +357,8 @@ def play_file(path, buffer=True):
 @check_playable
 def play_info_hash(info_hash, buffer=True):
     info = api.get_torrent_info(info_hash)
+
+    logging.info(info)
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
 

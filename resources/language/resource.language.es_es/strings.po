@@ -75,8 +75,8 @@ msgid "User-Agent"
 msgstr "User-Agent"
 
 msgctxt "#30031"
-msgid "Session saving frequency (seconds)"
-msgstr "Frecuencia de guardado de sesiones (segundos)"
+msgid "Ssl Connection"
+msgstr ""
 
 msgctxt "#30032"
 msgid "Enable tuned storage settings"
@@ -289,10 +289,6 @@ msgstr "Ejecutar como root (Android)"
 msgctxt "#30084"
 msgid "Piece expiration time"
 msgstr "Tiempo de caducidad de pieza"
-
-msgctxt "#30085"
-msgid "Force jacktorr binary - Requires restart"
-msgstr "Forzar binario de jacktorr - Requiere reiniciar"
 
 # Service
 msgctxt "#30100"

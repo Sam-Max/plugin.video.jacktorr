@@ -38,6 +38,14 @@ msgctxt "#30004"
 msgid "Show status overlay"
 msgstr ""
 
+msgctxt "#30005"
+msgid "Login"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Password"
+msgstr ""
+
 msgctxt "#30010"
 msgid "Download path"
 msgstr ""
@@ -51,15 +59,15 @@ msgid "Buffer size (B)"
 msgstr ""
 
 msgctxt "#30013"
-msgid "Listen port"
+msgid "ReaderReadAHead"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Listen interfaces"
+msgid "PreloadCache"
 msgstr ""
 
 msgctxt "#30015"
-msgid "Outgoing interfaces"
+msgid "PreloadBuffer"
 msgstr ""
 
 msgctxt "#30016"
@@ -71,11 +79,11 @@ msgid "Disable UPNP"
 msgstr ""
 
 msgctxt "#30018"
-msgid "User-Agent"
+msgid "EnableIPv6"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Session saving frequency (seconds)"
+msgid "Ssl Connection"
 msgstr ""
 
 msgctxt "#30032"
@@ -95,19 +103,19 @@ msgid "Max upload rate (B/s)"
 msgstr ""
 
 msgctxt "#30036"
-msgid "Share ratio limit (percent)"
+msgid "PeersListenPort"
 msgstr ""
 
 msgctxt "#30037"
-msgid "Seed time ratio limit (percent)"
+msgid "DhtConnectionLimit"
 msgstr ""
 
 msgctxt "#30038"
-msgid "Seed time limit (seconds)"
+msgid "TorrentDisconnectTimeout"
 msgstr ""
 
 msgctxt "#30039"
-msgid "Encryption policy"
+msgid "ForceEncrypt"
 msgstr ""
 
 msgctxt "#30040"
@@ -123,35 +131,35 @@ msgid "Forced"
 msgstr ""
 
 msgctxt "#30043"
-msgid "Proxy"
+msgid "DisableTCP"
 msgstr ""
 
 msgctxt "#30044"
-msgid "Proxy type"
+msgid "DisableUTP"
 msgstr ""
 
 msgctxt "#30045"
-msgid "SOCKS4"
+msgid "DisablePEX"
 msgstr ""
 
 msgctxt "#30046"
-msgid "SOCKS5"
+msgid "DisableUpload"
 msgstr ""
 
 msgctxt "#30047"
-msgid "SOCKS5 Password"
+msgid "RetrackersMode"
 msgstr ""
 
 msgctxt "#30048"
-msgid "HTTP"
+msgid "UseDisk"
 msgstr ""
 
 msgctxt "#30049"
-msgid "HTTP Password"
+msgid "RemoveCacheOnDrop"
 msgstr ""
 
 msgctxt "#30050"
-msgid "i2p"
+msgid "EnableDebug"
 msgstr ""
 
 msgctxt "#30051"
@@ -187,11 +195,11 @@ msgid "Alerts log level"
 msgstr ""
 
 msgctxt "#30059"
-msgid "Enable jacktorr service"
+msgid "Enable Service"
 msgstr ""
 
 msgctxt "#30060"
-msgid "Jacktorr sevice IP address"
+msgid "Service address"
 msgstr ""
 
 msgctxt "#30061"
@@ -235,31 +243,11 @@ msgid "Disable LSD"
 msgstr ""
 
 msgctxt "#30071"
-msgid "Maximum number of simultaneous downloading torrents"
+msgid "EnableDLNA"
 msgstr ""
 
 msgctxt "#30072"
-msgid "Maximum number of simultaneous seeding torrents"
-msgstr ""
-
-msgctxt "#30073"
-msgid "Maximum number of simultaneous checking torrents"
-msgstr ""
-
-msgctxt "#30074"
-msgid "Maximum number of torrents to announce to the DHT"
-msgstr ""
-
-msgctxt "#30075"
-msgid "Maximum number of torrents to announce to their trackers"
-msgstr ""
-
-msgctxt "#30076"
-msgid "Maximum number of torrents to announce to local network"
-msgstr ""
-
-msgctxt "#30077"
-msgid "Maximum number of active (auto managed) torrents"
+msgid "EnableRutorSearch"
 msgstr ""
 
 msgctxt "#30078"
@@ -290,17 +278,13 @@ msgctxt "#30084"
 msgid "Piece expiration time"
 msgstr ""
 
-msgctxt "#30085"
-msgid "Force jacktorr binary - Requires restart"
-msgstr ""
-
 # Service
 msgctxt "#30100"
-msgid "Jacktorr - first run"
+msgid "JackTorr - first run"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Please set the download path so you can properly use Jacktorr. Feel free to also change any other settings."
+msgid "Please set the server configuration so you can properly use JackTorr. Feel free to also change any other settings."
 msgstr ""
 
 msgctxt "#30102"
