@@ -2,16 +2,18 @@ import json
 import logging
 import os
 import threading
-
-import requests
+from requests import request
+from requests.auth import HTTPBasicAuth
 from lib.utils import assure_unicode
 import xbmc
 import xbmcgui
 
 from lib import kodi
 from lib.settings import (
+    get_password,
     get_port,
     get_service_host,
+    get_username,
     service_enabled,
     ssl_enabled,
 )
@@ -42,6 +44,9 @@ class DaemonMonitor(xbmc.Monitor):
         self._enabled = None
         self._host = get_service_host()
         self._port = get_port()
+        self._username = get_username()
+        self._password = get_password()
+        self._auth = HTTPBasicAuth(self._username, self._password)
         self._ssl_enabled = ssl_enabled()
         self._base_url = "{}://{}:{}".format(
             "https" if self._ssl_enabled else "http", self._host, self._port
@@ -53,9 +58,10 @@ class DaemonMonitor(xbmc.Monitor):
         ]
 
     def _request(self, method, url, **kwargs):
-        return requests.request(
+        return request(
             method,
             f"{self._base_url}/{url}",
+            auth=self._auth,
             **kwargs,
         )
 
