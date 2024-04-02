@@ -1,7 +1,7 @@
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-
+from urllib.parse import quote
 
 class TorrServer(object):
     def __init__(self, host, port, username, password, ssl_enabled=False, session=None):
@@ -124,7 +124,7 @@ class TorrServer(object):
 
     def get_stream_url(self, link, path, file_id):
         """returns the stream url"""
-        return f"{self._base_url}/stream/{path}?link={link}&index={file_id}&play"
+        return f"{self._base_url}/stream/{quote(path)}?link={link}&index={file_id}&play"
 
     def get_settings(self):
         res = self._post("/settings", data=json.dumps({"action": "get"}))

@@ -356,8 +356,6 @@ def play_file(path, buffer=True):
 @check_playable
 def play_info_hash(info_hash, buffer=True):
     info = api.get_torrent_info(info_hash)
-
-    logging.info(info)
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
 
@@ -421,6 +419,9 @@ def wait_for_metadata(info_hash):
 @check_playable
 def buffer_and_play(info_hash, file_id, path):
     preload_torrent(info_hash, file_id)
+    info = api.get_torrent_info(info_hash)
+    if info.get("stat") == 1:
+        wait_for_metadata(info_hash)
     wait_for_buffering_completion(info_hash, file_id)
     play(info_hash, file_id, path=path)
 
@@ -447,9 +448,6 @@ def wait_for_buffering_completion(info_hash, file_id):
             status = api.get_torrent_file_info(info_hash, file_id)
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
-
-            if preload_size == 0 or preloaded_bytes == 0:
-                continue
 
             if preloaded_bytes >= preload_size:
                 break
