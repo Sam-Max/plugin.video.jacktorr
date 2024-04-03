@@ -88,6 +88,7 @@ def check_directory(func):
             return ret
         finally:
             endOfDirectory(plugin.handle, succeeded=succeeded)
+
     return wrapper
 
 
@@ -449,10 +450,15 @@ def wait_for_buffering_completion(info_hash, file_id):
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
 
-            if preloaded_bytes >= preload_size:
-                break
+            if preloaded_bytes != 0:
+                if preloaded_bytes >= preload_size:
+                    break
 
-            buffering_progress = preloaded_bytes * 100 / preload_size
+            if preload_size != 0:
+                buffering_progress = preloaded_bytes * 100 / preload_size
+            else:
+                buffering_progress = 0
+
             speed = status.get("download_speed", 0)
             name = info.get("name")
 

@@ -14,10 +14,6 @@ def get_port():
     return get_int_setting("service_port")
 
 
-def get_daemon_timeout():
-    return get_int_setting("timeout")
-
-
 def get_metadata_timeout():
     return get_int_setting("metadata_timeout")
 
@@ -58,13 +54,7 @@ def get_password():
     return get_setting("service_password")
 
 
-def download_after_insert():
-    return get_boolean_setting("download_after_insert")
-
-
 def get_files_order():
     return get_int_setting("files_order")
 
 
-def show_background_progress():
-    return get_boolean_setting("show_bg_progress")
