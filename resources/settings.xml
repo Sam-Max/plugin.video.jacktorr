@@ -2,7 +2,6 @@
 <settings>
     <category label="$INFO[System.AddonTitle(Window.Property(Addon.ID))]">
         <setting id="service_enabled" type="bool" label="30059" default="true"/>
-        <setting id="timeout" type="number" label="30002" default="20" enable="eq(-1,true)" subsetting="true"/>
         <setting id="service_host" type="text" label="30060" default="127.0.0.1" enable="eq(-3,false)"/>
         <setting id="service_port" type="number" label="30001" default="5665"/>
         <setting id="ssl_connection" type="bool" label="30031" default="false"/>
@@ -11,11 +10,9 @@
         <setting id="files_order" type="enum" label="30064" default="0" lvalues="30065|30066|30067"/>
         <setting id="overlay" type="bool" label="30004" default="true"/>
         <setting id="metadata_timeout" type="slider" label="30081" option="int" range="0,10,120" default="30"/>
-        <setting id="buffer_timeout" type="slider" label="30003" option="int" range="0,30,600" default="300"/>
+        <setting id="buffer_timeout" type="slider" label="30003" option="int" range="0,30,600" default="60"/>
         <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
         <setting id="ask_to_delete" type="bool" label="30056" default="true"/>
-        <setting id="show_bg_progress" type="bool" label="30068" default="true"/>
-        <setting id="download_after_insert" type="bool" label="30062" default="false"/>
         <setting id="migrated" type="bool" visible="false" default="false"/>
     </category>
     <!--General -->
@@ -23,7 +20,6 @@
 		<setting id="s:CacheSize" label="30012" type="number" default="70" />
 		<setting id="s:ReaderReadAHead" label="30013" type="number" default="95" />
 		<setting id="s:PreloadCache" label="30014" type="number" default="0" />
-		<setting id="s:PreloadBuffer" label="30015" type="bool" default="false" />
 		<setting id="s:EnableIPv6" label="30018" type="bool" default="False" />
 		<setting id="s:DisableTCP" label="30043" type="bool" default="False" />
 		<setting id="s:DisableUTP" label="30044" type="bool" default="False" />
@@ -32,7 +28,7 @@
 		<setting id="s:DisableDHT" label="30016" type="bool" default="False" />
 		<setting id="s:DisableUpload" label="30046" type="bool" default="False" />
 		<setting id="s:ForceEncrypt" label="30039" type="bool" default="False"/>
-		<setting id="s:RetrackersMode" label="30047" type="enum" lvalues="30032|30033|30034|30035" default="1" />
+		<setting id="s:RetrackersMode" label="30047" type="enum" lvalues="30032|30033|30040|30041" default="1" />
 		<setting id="s:DownloadRateLimit" label="30034" type="number" default="0" />
 		<setting id="s:UploadRateLimit" label="30035" type="number" default="0" />
 		<setting id="s:ConnectionsLimit" label="30011" type="number" default="40" />
