@@ -512,10 +512,10 @@ def play(info_hash, file_id, path):
 def dialog_insert():
     window = DialogInsert("DialogInsert.xml", ADDON_PATH, "Default")
     window.doModal()
-    if window.type == DialogInsert.TYPE_PATH:
-        api.add_torrent(window.ret_val)
-    elif window.type == DialogInsert.TYPE_URL:
+    if window.type == DialogInsert.TYPE_URL:
         api.add_magnet(window.ret_val)
+    elif window.type == DialogInsert.TYPE_PATH:
+        api.add_torrent(window.ret_val)
     else:
         return
     notification(translate(30243), time=2000)

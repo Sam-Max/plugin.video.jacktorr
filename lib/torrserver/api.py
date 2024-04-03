@@ -1,7 +1,8 @@
-import json
+from json import dumps
 import requests
 from requests.auth import HTTPBasicAuth
 from urllib.parse import quote
+
 
 class TorrServer(object):
     def __init__(self, host, port, username, password, ssl_enabled=False, session=None):
@@ -21,7 +22,7 @@ class TorrServer(object):
     def add_magnet(self, magnet, title="", poster="", data=""):
         return self._post(
             "/torrents",
-            data=json.dumps(
+            data=dumps(
                 {
                     "action": "add",
                     "link": magnet,
@@ -38,38 +39,34 @@ class TorrServer(object):
             return self._post(
                 "/torrent/upload",
                 files={"file": file},
-                data=json.dumps(
-                    {
-                        "save": "true",
-                        "title": title,
-                        "poster": poster,
-                        "data": data,
-                    }
-                ),
+                data={
+                    "save": "true",
+                    "title": title,
+                    "poster": poster,
+                    "data": data,
+                },
             ).json()["hash"]
 
     def add_torrent_obj(self, obj, title="", poster="", data=""):
         return self._post(
             "/torrent/upload",
             files={"file": obj},
-            data=json.dumps(
-                {
-                    "save": "true",
-                    "title": title,
-                    "poster": poster,
-                    "data": data,
-                }
-            ),
+            data={
+                "save": "true",
+                "title": title,
+                "poster": poster,
+                "data": data,
+            },
         ).json()["hash"]
 
     def torrents(self):
         """read info about all torrents (doesn't fill file_stats info)"""
-        return self._post("/torrents", data=json.dumps({"action": "list"})).json()
+        return self._post("/torrents", data=dumps({"action": "list"})).json()
 
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""
         return self._post(
-            "/torrents", data=json.dumps({"action": "get", "hash": hash})
+            "/torrents", data=dumps({"action": "get", "hash": hash})
         ).json()
 
     def get_torrent_info(self, link):
@@ -83,17 +80,13 @@ class TorrServer(object):
         ).json()
 
     def drop_torrent(self, hash):
-        return self._post(
-            "/torrents", data=json.dumps({"action": "drop", "hash": hash})
-        )
+        return self._post("/torrents", data=dumps({"action": "drop", "hash": hash}))
 
     def remove_torrent(self, info_hash, save_to_db=True):
         """delete torrent from TorrServer"""
         return self._post(
             "/torrents",
-            data=json.dumps(
-                {"action": "rem", "hash": info_hash, "save_to_db": save_to_db}
-            ),
+            data=dumps({"action": "rem", "hash": info_hash, "save_to_db": save_to_db}),
         )
 
     def play_torrent(self, hash, id):
@@ -127,7 +120,7 @@ class TorrServer(object):
         return f"{self._base_url}/stream/{quote(path)}?link={link}&index={file_id}&play"
 
     def get_settings(self):
-        res = self._post("/settings", data=json.dumps({"action": "get"}))
+        res = self._post("/settings", data=dumps({"action": "get"}))
         return res.json()
 
     def _post(self, url, **kwargs):
@@ -142,13 +135,13 @@ class TorrServer(object):
     def _delete(self, url, **kwargs):
         return self._request("delete", url, **kwargs)
 
-    def _request(self, method, url, validate=True, **kwargs):
-        res = self._session.request(
-            method, self._base_url + url, auth=self._auth, **kwargs
-        )
-        if validate and res.status_code >= 400:
-            raise TorrServerError(res.text)
-        return res
+    def _request(self, method, url, **kwargs):
+        try:
+            return self._session.request(
+                method, self._base_url + url, auth=self._auth, **kwargs
+            )
+        except Exception as e:
+            raise TorrServerError(str(e))
 
 
 class TorrServerError(Exception):
