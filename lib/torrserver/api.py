@@ -102,13 +102,13 @@ class TorrServer(object):
             params={"link": link, "title": title, "poster": poster, "play": "true"},
         )
 
-    def preload_torrent(self, link, file_index=1, title=""):
+    def preload_torrent(self, link, file_id=1, title=""):
         """preload torrent"""
         return self._get(
             "/stream",
             params={
                 "link": link,
-                "index": file_index,
+                "index": file_id,
                 "title": title,
                 "stat": "true",
                 "preload": "true",

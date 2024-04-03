@@ -4,7 +4,7 @@ import os
 import threading
 from requests import request
 from requests.auth import HTTPBasicAuth
-from lib.utils import assure_unicode
+from lib.utils import assure_unicode, megabytes_to_bytes
 import xbmc
 import xbmcgui
 
@@ -72,6 +72,7 @@ class DaemonMonitor(xbmc.Monitor):
         s["TorrentsSavePath"] = assure_unicode(
             kodi.translatePath(s["TorrentsSavePath"])
         )
+        s["CacheSize"] = megabytes_to_bytes(s["CacheSize"])
         return s
 
     def _get_daemon_settings(self):

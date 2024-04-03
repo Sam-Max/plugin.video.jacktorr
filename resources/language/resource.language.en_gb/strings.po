@@ -51,7 +51,7 @@ msgid "Connections limit"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Buffer size (B)"
+msgid "Cache size (MB)"
 msgstr ""
 
 msgctxt "#30013"
@@ -59,7 +59,7 @@ msgid "ReaderReadAHead"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Preload Cache"
+msgid "Preload Cache (%)"
 msgstr ""
 
 msgctxt "#30016"

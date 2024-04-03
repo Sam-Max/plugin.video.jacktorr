@@ -17,9 +17,9 @@
     </category>
     <!--General -->
     <category label="Settings">
-		<setting id="s:CacheSize" label="30012" type="number" default="70" />
+		<setting id="s:CacheSize" label="30012" type="number" default="25" />
 		<setting id="s:ReaderReadAHead" label="30013" type="number" default="95" />
-		<setting id="s:PreloadCache" label="30014" type="number" default="0" />
+		<setting id="s:PreloadCache" label="30014" type="number" default="50" />
 		<setting id="s:EnableIPv6" label="30018" type="bool" default="False" />
 		<setting id="s:DisableTCP" label="30043" type="bool" default="False" />
 		<setting id="s:DisableUTP" label="30044" type="bool" default="False" />

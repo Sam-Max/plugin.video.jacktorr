@@ -431,7 +431,6 @@ def preload_torrent(info_hash, file_id):
     thread = Thread(target=api.preload_torrent, args=(info_hash, file_id))
     thread.start()
 
-
 def wait_for_buffering_completion(info_hash, file_id):
     close_busy_dialog()
     info = api.get_torrent_file_info(info_hash, file_id)
@@ -450,7 +449,7 @@ def wait_for_buffering_completion(info_hash, file_id):
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
 
-            if preloaded_bytes != 0:
+            if preloaded_bytes != 0 and preload_size != 0:
                 if preloaded_bytes >= preload_size:
                     break
 
@@ -504,7 +503,7 @@ def play(info_hash, file_id, path):
             if show_status_overlay()
             else None
         ),
-        on_close_handler=lambda: handle_player_stop(info_hash, name=path),
+        on_close_handler=lambda: handle_player_stop(info_hash, name=name),
     ).handle_events()
 
 
