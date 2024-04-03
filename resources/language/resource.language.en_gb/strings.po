@@ -257,7 +257,7 @@ msgid "Add torrent/magnet"
 msgstr ""
 
 msgctxt "#30208"
-msgid "Stop downloading"
+msgid "Drop torrent"
 msgstr ""
 
 msgctxt "#30209"

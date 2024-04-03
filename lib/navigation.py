@@ -210,7 +210,7 @@ def torrents():
 
         if torrent.get("stat") in [2, 3]:
             context_menu_items.append(
-                (translate(30208), action(torrent_action, info_hash, "stop"))
+                (translate(30208), action(torrent_action, info_hash, "drop"))
             )
 
         context_menu_items.extend(
@@ -240,7 +240,7 @@ def torrents():
 def torrent_action(info_hash, action_str):
     needs_refresh = True
 
-    if action_str == "stop":
+    if action_str == "drop":
         api.drop_torrent(info_hash)
     elif action_str == "remove_torrent":
         api.remove_torrent(info_hash)
@@ -253,6 +253,18 @@ def torrent_action(info_hash, action_str):
 
     if needs_refresh:
         refresh()
+
+
+@plugin.route("/torrents/<info_hash>/files/<file_id>/<action_str>")
+def file_action(info_hash, file_id, action_str):
+    if action_str == "download":
+        api.download_file(info_hash, file_id)
+    elif action_str == "drop":
+        api.drop_torrent(info_hash, file_id)
+    else:
+        logging.error("Unknown action '%s'", action_str)
+        return
+    refresh()
 
 
 def torrent_status(info_hash):
@@ -430,6 +442,7 @@ def buffer_and_play(info_hash, file_id, path):
 def preload_torrent(info_hash, file_id):
     thread = Thread(target=api.preload_torrent, args=(info_hash, file_id))
     thread.start()
+
 
 def wait_for_buffering_completion(info_hash, file_id):
     close_busy_dialog()
