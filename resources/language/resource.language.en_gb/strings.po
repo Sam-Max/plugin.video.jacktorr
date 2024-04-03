@@ -59,11 +59,7 @@ msgid "ReaderReadAHead"
 msgstr ""
 
 msgctxt "#30014"
-msgid "PreloadCache"
-msgstr ""
-
-msgctxt "#30015"
-msgid "PreloadBuffer"
+msgid "Preload Cache"
 msgstr ""
 
 msgctxt "#30016"
@@ -99,7 +95,7 @@ msgid "Max upload rate (B/s)"
 msgstr ""
 
 msgctxt "#30036"
-msgid "PeersListenPort"
+msgid "Peers Listen Port"
 msgstr ""
 
 msgctxt "#30037"
@@ -111,7 +107,7 @@ msgid "TorrentDisconnectTimeout"
 msgstr ""
 
 msgctxt "#30039"
-msgid "ForceEncrypt"
+msgid "Force Encrypt"
 msgstr ""
 
 msgctxt "#30040"
