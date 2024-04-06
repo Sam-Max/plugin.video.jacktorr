@@ -299,11 +299,13 @@ def torrent_files(info_hash):
 
         context_menu_items = []
         info_labels = {"title": info.get("title")}
+        kwargs = dict(info_hash=info_hash, file_id=id, path=name)
+
         if is_picture(name):
-            url = plugin.url_for(display_picture, info_hash, id, name)
+            url = plugin.url_for(display_picture, **kwargs)
             file_li.setInfo("pictures", info_labels)
         elif is_text(name):
-            url = plugin.url_for(display_text, info_hash, id, name)
+            url = plugin.url_for(display_text, **kwargs)
         else:
             url = serve_url
             if is_video(name):
@@ -314,8 +316,6 @@ def torrent_files(info_hash):
                 info_type = None
 
             if info_type is not None:
-                kwargs = dict(info_hash=info_hash, file_id=id, path=name)
-
                 url = plugin.url_for(play, **kwargs)
                 file_li.setInfo(info_type, info_labels)
                 file_li.setProperty("IsPlayable", "true")
@@ -329,12 +329,14 @@ def torrent_files(info_hash):
         addDirectoryItem(plugin.handle, url, file_li)
 
 
-@plugin.route("/display_picture/<info_hash>/<file_id>/<path>")
+@plugin.route("/display_picture/<info_hash>/<file_id>")
+@query_arg("path")
 def display_picture(info_hash, file_id, path):
     show_picture(api.get_stream_url(link=info_hash, path=path, file_id=file_id))
 
 
-@plugin.route("/display_text/<info_hash>/<file_id>/<path>")
+@plugin.route("/display_text/<info_hash>/<file_id>")
+@query_arg("path")
 def display_text(info_hash, file_id, path):
     r = requests.get(api.get_stream_url(link=info_hash, path=path, file_id=file_id))
     Dialog().textviewer(path, r.text)
@@ -346,7 +348,7 @@ def display_text(info_hash, file_id, path):
 def play_url(url, buffer=True):
     r = requests.get(url, stream=True)
     info_hash = api.add_torrent_obj(r.raw)
-    play_info_hash(info_hash, buffer=buffer)
+    play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
 @plugin.route("/play_magnet")
@@ -354,7 +356,7 @@ def play_url(url, buffer=True):
 @check_playable
 def play_magnet(magnet, buffer=True):
     info_hash = api.add_magnet(magnet)
-    play_info_hash(info_hash, buffer=buffer)
+    play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
 @plugin.route("/play_path")
@@ -362,10 +364,11 @@ def play_magnet(magnet, buffer=True):
 @check_playable
 def play_file(path, buffer=True):
     info_hash = api.add_torrent(path)
-    play_info_hash(info_hash, buffer=buffer)
+    play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
-@plugin.route("/play_info_hash/<info_hash>")
+@plugin.route("/play_info_hash")
+@query_arg("info_hash")
 @check_playable
 def play_info_hash(info_hash, buffer=True):
     info = api.get_torrent_info(info_hash)
@@ -394,9 +397,9 @@ def play_info_hash(info_hash, buffer=True):
         chosen_file = candidate_files[chosen_index]
 
     if buffer:
-        buffer_and_play(info_hash, chosen_file.get("id"), path=chosen_file.get("path"))
+        buffer_and_play(info_hash=info_hash, file_id=chosen_file.get("id"), path=chosen_file.get("path"))
     else:
-        play(info_hash, chosen_file.get("id"), path=chosen_file.get("path"))
+        play(info_hash=info_hash, file_id=chosen_file.get("id"), path=chosen_file.get("path"))
 
 
 def wait_for_metadata(info_hash):
@@ -427,7 +430,9 @@ def wait_for_metadata(info_hash):
         progress.close()
 
 
-@plugin.route("/buffer_and_play/<info_hash>/<file_id>")
+@plugin.route("/buffer_and_play")
+@query_arg("info_hash")
+@query_arg("file_id")
 @query_arg("path")
 @check_playable
 def buffer_and_play(info_hash, file_id, path):
@@ -436,7 +441,7 @@ def buffer_and_play(info_hash, file_id, path):
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
     wait_for_buffering_completion(info_hash, file_id)
-    play(info_hash, file_id, path=path)
+    play(info_hash=info_hash, file_id=file_id, path=path)
 
 
 def preload_torrent(info_hash, file_id):
@@ -501,7 +506,9 @@ def wait_for_buffering_completion(info_hash, file_id):
         progress.close()
 
 
-@plugin.route("/play/<info_hash>/<file_id>")
+@plugin.route("/play")
+@query_arg("info_hash")
+@query_arg("file_id")
 @query_arg("path")
 @check_playable
 def play(info_hash, file_id, path):
