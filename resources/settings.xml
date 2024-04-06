@@ -2,7 +2,7 @@
 <settings>
     <category label="$INFO[System.AddonTitle(Window.Property(Addon.ID))]">
         <setting id="service_enabled" type="bool" label="30059" default="true"/>
-        <setting id="service_host" type="text" label="30060" default="127.0.0.1" enable="eq(-3,false)"/>
+        <setting id="service_host" type="text" label="30060" default="127.0.0.1"/>
         <setting id="service_port" type="number" label="30001" default="5665"/>
         <setting id="ssl_connection" type="bool" label="30031" default="false"/>
 		<setting id="service_login" label="30005" type="text" default="" />
