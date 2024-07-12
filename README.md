@@ -2,7 +2,7 @@
 
 JackTorr is an torrent streaming engine for Kodi that implements [TorrServer](https://github.com/YouROK/TorrServer), which provides several features like an http API for streaming, memory and disk cache, API auth, etc
 
-**NOTE** The addon has not inbuilt TorrServer daemon, so you need to deploy externally and configure server on Jacktorr settings.
+**NOTE**: The addon has not inbuilt TorrServer daemon, so you need to deploy externally and configure server on Jacktorr settings.
 
 ## Installation
 
