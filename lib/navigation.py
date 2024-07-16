@@ -397,9 +397,17 @@ def play_info_hash(info_hash, buffer=True):
         chosen_file = candidate_files[chosen_index]
 
     if buffer:
-        buffer_and_play(info_hash=info_hash, file_id=chosen_file.get("id"), path=chosen_file.get("path"))
+        buffer_and_play(
+            info_hash=info_hash,
+            file_id=chosen_file.get("id"),
+            path=chosen_file.get("path"),
+        )
     else:
-        play(info_hash=info_hash, file_id=chosen_file.get("id"), path=chosen_file.get("path"))
+        play(
+            info_hash=info_hash,
+            file_id=chosen_file.get("id"),
+            path=chosen_file.get("path"),
+        )
 
 
 def wait_for_metadata(info_hash):
@@ -516,15 +524,18 @@ def play(info_hash, file_id, path):
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
     setResolvedUrl(plugin.handle, True, ListItem(name, path=serve_url))
 
-    JackTorrPlayer(
-        url=serve_url,
-        text_handler=(
-            (lambda: get_status_labels(info_hash) + (name,))
-            if show_status_overlay()
-            else None
-        ),
-        on_close_handler=lambda: handle_player_stop(info_hash, name=name),
-    ).handle_events()
+    try:
+        with JackTorrPlayer(
+            text_handler=(
+                (lambda: get_status_labels(info_hash) + (name,))
+                if show_status_overlay()
+                else None
+            ),
+            on_close_handler=lambda: handle_player_stop(info_hash, name=name),
+        ) as player:
+            player.handle_events(url=serve_url)
+    except Exception as e:
+        logging.error("Caught exception while playing file: %s", e, exc_info=True)
 
 
 @plugin.route("/insert")
