@@ -474,6 +474,9 @@ def wait_for_buffering_completion(info_hash, file_id):
             status = api.get_torrent_file_info(info_hash, file_id)
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
+            seeds = status.get("connected_seeders", 0)
+            peers = status.get("active_peers", 0)
+            totalPeers = status.get("total_peers", 0)
 
             if preloaded_bytes != 0 and preload_size != 0:
                 if preloaded_bytes >= preload_size:
@@ -489,13 +492,14 @@ def wait_for_buffering_completion(info_hash, file_id):
 
             progress.update(
                 int(buffering_progress),
-                "{} - {:.2f}%\n{} {} {} - {}/s\n{}\n".format(
+                "{} - {:.2f}%\n{} {} {} - {}/s S:{} P:{}/{}\n{}\n".format(
                     get_state_string(status.get("stat")),
                     buffering_progress,
                     sizeof_fmt(preloaded_bytes),
                     of,
                     sizeof_fmt(preload_size),
                     sizeof_fmt(speed),
+                    seeds, peers, totalPeers,
                     name,
                 ),
             )
