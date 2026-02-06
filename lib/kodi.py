@@ -20,6 +20,7 @@ else:
     def translate(*args, **kwargs):
         return ADDON.getLocalizedString(*args, **kwargs).encode("utf-8")
 
+
 ADDON_NAME = ADDON.getAddonInfo("name")
 ADDON_ID = ADDON.getAddonInfo("id")
 ADDON_PATH = assure_unicode(ADDON.getAddonInfo("path"))
@@ -35,7 +36,7 @@ WINDOW_HOME = 10000
 WINDOW_FULLSCREEN_VIDEO = 12005
 
 
-def notification(message, heading=ADDON_NAME, icon=ADDON_ICON, time=5000, sound=True):
+def notification(message, heading=ADDON_NAME, icon=ADDON_ICON, time=3000, sound=True):
     xbmcgui.Dialog().notification(heading, message, icon, time, sound)
 
 
@@ -173,7 +174,9 @@ class KodiLogHandler(logging.StreamHandler):
         pass
 
     def __repr__(self):
-        return "<{}({})>".format(self.__class__.__name__, logging.getLevelName(self.level))
+        return "<{}({})>".format(
+            self.__class__.__name__, logging.getLevelName(self.level)
+        )
 
 
 def set_logger(name=None, level=logging.NOTSET):
