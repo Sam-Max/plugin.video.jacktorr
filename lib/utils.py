@@ -39,11 +39,14 @@ else:
             s = s.encode("utf-8")
         return s
 
+
 def megabytes_to_bytes(megabytes):
     return megabytes * 1024 * 1024
 
 
 def sizeof_fmt(num, suffix="B", divisor=1000.0):
+    if num is None:
+        num = 0
     for unit in ("", "k", "M", "G", "T", "P", "E", "Z"):
         if abs(num) < divisor:
             return "{:.2f}{}{}".format(num, unit, suffix)
