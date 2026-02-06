@@ -10,7 +10,7 @@
 
 ---
 
-[Features](#-features) • [Installation](#-installation) • [Docker Setup](#-docker-setup) • [API Guide](#-api-guide) • [Donations](#-support)
+[Features](#-features) • [Installation](#-installation) • [Server Setup](#-server-setup) • [API Guide](#-api-guide) • [Donations](#-support)
 
 </div>
 
@@ -43,9 +43,18 @@
 
 ---
 
-## 🐳 Docker Setup
+## 🚀 Server Setup
 
-The easiest way to run TorrServer is via Docker. Use the following `docker-compose.yml` fragment:
+JackTorr requires an external TorrServer instance to function. You can set this up in several ways:
+
+### 📱 Android (Recommended for Mobile/TV)
+For Android-based devices (including Android TV/Nvidia Shield), the simplest method is to install the official TorrServer APK:
+1.  **Download & Install**: [TorrServer on F-Droid](https://f-droid.org/packages/ru.yourok.torrserve/)
+2.  **Launch the App**: Open TorrServer and ensure the service is running.
+3.  **Config**: In JackTorr settings, use `127.0.0.1` as the host if running on the same device.
+
+### 🐳 Docker (Cross-Platform)
+The easiest way to run TorrServer on servers or PCs is via Docker. Use the following `docker-compose.yml` fragment:
 
 ```yaml
 version: '3.3'
