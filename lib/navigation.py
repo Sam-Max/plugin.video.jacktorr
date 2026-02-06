@@ -316,7 +316,7 @@ def torrent_files(info_hash):
                 info_type = None
 
             if info_type is not None:
-                url = plugin.url_for(play, **kwargs)
+                url = plugin.url_for(buffer_and_play, **kwargs)
                 file_li.setInfo(info_type, info_labels)
                 file_li.setProperty("IsPlayable", "true")
 
