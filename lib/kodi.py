@@ -21,6 +21,20 @@ else:
         return ADDON.getLocalizedString(*args, **kwargs).encode("utf-8")
 
 
+def set_info_tag(list_item, info_type, info_labels):
+    if info_type == "video" and hasattr(list_item, "getVideoInfoTag"):
+        tag = list_item.getVideoInfoTag()
+        tag.setTitle(info_labels.get("title"))
+    elif info_type == "music" and hasattr(list_item, "getMusicInfoTag"):
+        tag = list_item.getMusicInfoTag()
+        tag.setTitle(info_labels.get("title"))
+    elif info_type == "pictures" and hasattr(list_item, "getPictureInfoTag"):
+        tag = list_item.getPictureInfoTag()
+        tag.setTitle(info_labels.get("title"))
+    else:
+        list_item.setInfo(info_type, info_labels)
+
+
 ADDON_NAME = ADDON.getAddonInfo("name")
 ADDON_ID = ADDON.getAddonInfo("id")
 ADDON_PATH = assure_unicode(ADDON.getAddonInfo("path"))

@@ -20,6 +20,7 @@ from lib.kodi import (
     refresh,
     show_picture,
     close_busy_dialog,
+    set_info_tag,
 )
 from lib.kodi_formats import is_music, is_picture, is_video, is_text
 from lib.player import JackTorrPlayer
@@ -303,7 +304,7 @@ def torrent_files(info_hash):
 
         if is_picture(name):
             url = plugin.url_for(display_picture, **kwargs)
-            file_li.setInfo("pictures", info_labels)
+            set_info_tag(file_li, "pictures", info_labels)
         elif is_text(name):
             url = plugin.url_for(display_text, **kwargs)
         else:
@@ -317,7 +318,7 @@ def torrent_files(info_hash):
 
             if info_type is not None:
                 url = plugin.url_for(buffer_and_play, **kwargs)
-                file_li.setInfo(info_type, info_labels)
+                set_info_tag(file_li, info_type, info_labels)
                 file_li.setProperty("IsPlayable", "true")
 
                 context_menu_items.append(
