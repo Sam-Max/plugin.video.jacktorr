@@ -1,17 +1,53 @@
-# plugin.video.jacktorr
+<div align="center">
 
-JackTorr is an torrent streaming engine for Kodi that implements [TorrServer](https://github.com/YouROK/TorrServer), which provides several features like an http API for streaming, memory and disk cache, API auth, etc
+# ⚡ JackTorr
 
-**NOTE**: The addon has not inbuilt TorrServer daemon, so you need to deploy externally and configure server on Jacktorr settings.
+*An TorrServer streaming addon for Kodi.*
 
-## Installation
+[![Kodi Version](https://img.shields.io/badge/Kodi-19+-blue.svg)](https://kodi.tv)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Support on Ko-fi](https://img.shields.io/badge/Support%20on%20Ko--fi-F16061?logo=ko-fi&logoColor=white)](https://ko-fi.com/sammax09)
 
-To install the addon, get the [latest release](https://github.com/Sam-Max/plugin.video.jacktorr/releases/latest) from github.
-**Do NOT use the `Download ZIP` button on this page.** 
+---
 
-## Docker Compose
+[Features](#-features) • [Installation](#-installation) • [Docker Setup](#-docker-setup) • [API Guide](#-api-guide) • [Donations](#-support)
 
-```
+</div>
+
+## 🌟 Overview
+
+**JackTorr** is a high-performance torrent streaming addon for Kodi. It leverages the power of [TorrServer](https://github.com/YouROK/TorrServer) to provide a seamless streaming experience, featuring on-the-fly metadata retrieval, intelligent buffering, and comprehensive playback controls.
+
+---
+
+## ✨ Features
+
+- **🚀 High-Speed Streaming**: Optimized for TorrServer's HTTP API for efficient torrent streaming.
+- **📦 Versatile Input**: Support for Magnet links, local `.torrent` files, and direct torrent URLs.
+- **📊 Real-time Status**: Optional status overlay showing download speed, active peers, and buffering progress.
+- **⚙️ Advanced Buffering**: Configurable pre-load cache and buffering timeouts.
+- **📂 Smart File Selection**: Automatically identifies video candidates or lets you choose from multiple files.
+- **🔌 API for Addons**: Simple plugin API allows other Kodi addons to trigger JackTorr playback.
+
+---
+
+## 📥 Installation
+
+1.  **Direct Download**: Get the [latest release](https://github.com/Sam-Max/plugin.video.jacktorr/releases/latest).
+2.  **Kodi Install**:
+    - Go to `Settings` > `Add-ons`.
+    - Select `Install from zip file`. (Ensure "Unknown Sources" is enabled).
+    - Locate and select the downloaded file.
+    
+**NOTE**: JackTorr requires an external [TorrServer](https://github.com/YouROK/TorrServer) instance. It does not include the TorrServer daemon itself. You must configure the server address in the addon settings.
+
+---
+
+## 🐳 Docker Setup
+
+The easiest way to run TorrServer is via Docker. Use the following `docker-compose.yml` fragment:
+
+```yaml
 version: '3.3'
 services:
     torrserver:
@@ -31,12 +67,42 @@ services:
         restart: unless-stopped
 ```
 
-## Calling jacktorr from other addon
+---
 
-One can call jacktorr from other addons. To do so, simply use jacktorr API:
+## 🛠️ API Guide
 
-|Url|Description|
-|---|-----------|
-|`plugin://plugin.video.jacktorr/play_magnet?magnet=<magnet>`|Plays the provided `<magnet>`|
-|`plugin://plugin.video.jacktorr/play_url?url=<url>`|Plays the provided torrent file `<url>`|
-|`plugin://plugin.video.jacktorr/play_path?path=<path>`|Plays the provided torrent file path `<path>`|
+Developers can integrate JackTorr into their own addons using the following protocol:
+
+| Action | URL Pattern | Description |
+| :--- | :--- | :--- |
+| **Play Magnet** | `plugin://plugin.video.jacktorr/play_magnet?magnet=<magnet>` | Plays the provided Magnet link |
+| **Play URL** | `plugin://plugin.video.jacktorr/play_url?url=<url>` | Plays torrent from a web URL |
+| **Play Path** | `plugin://plugin.video.jacktorr/play_path?path=<path>` | Plays torrent from a local file path |
+
+---
+
+## 📸 Screenshots
+
+| Player Interface |
+| :---: |
+| ![Screenshot](resources/screenshots/screenshot-1.jpg) |
+
+---
+
+## ☕ Support
+
+If you enjoy using **JackTorr** and want to support its development, you can buy me a coffee!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/sammax09)
+
+---
+
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<div align="center">
+Made with ❤️ for the Kodi Community
+</div>
