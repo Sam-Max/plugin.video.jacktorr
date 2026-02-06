@@ -476,7 +476,7 @@ def wait_for_buffering_completion(info_hash, file_id):
             preload_size = status.get("preload_size", 0)
             seeds = status.get("connected_seeders", 0)
             peers = status.get("active_peers", 0)
-            totalPeers = status.get("total_peers", 0)
+            total_peers = status.get("total_peers", 0)
 
             if preloaded_bytes != 0 and preload_size != 0:
                 if preloaded_bytes >= preload_size:
@@ -499,7 +499,9 @@ def wait_for_buffering_completion(info_hash, file_id):
                     of,
                     sizeof_fmt(preload_size),
                     sizeof_fmt(speed),
-                    seeds, peers, totalPeers,
+                    seeds,
+                    peers,
+                    total_peers,
                     name,
                 ),
             )
