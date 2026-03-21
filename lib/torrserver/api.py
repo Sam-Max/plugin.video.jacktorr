@@ -20,7 +20,8 @@ class TorrServer(object):
         return self._get("/echo").content
 
     def add_magnet(self, magnet, title="", poster="", data=""):
-        return self._post(
+        return self._parse_json_response(
+            self._post(
             "/torrents",
             data=dumps(
                 {
@@ -32,52 +33,70 @@ class TorrServer(object):
                     "save_to_db": True,
                 }
             ),
-        ).json()["hash"]
+            ),
+            "/torrents",
+        )["hash"]
 
     def add_torrent(self, path, title="", poster="", data=""):
         with open(path, "rb") as file:
-            return self._post(
+            return self._parse_json_response(
+                self._post(
+                    "/torrent/upload",
+                    files={"file": file},
+                    data={
+                        "save": "true",
+                        "title": title,
+                        "poster": poster,
+                        "data": data,
+                    },
+                ),
                 "/torrent/upload",
-                files={"file": file},
+            )["hash"]
+
+    def add_torrent_obj(self, obj, title="", poster="", data=""):
+        return self._parse_json_response(
+            self._post(
+                "/torrent/upload",
+                files={"file": obj},
                 data={
                     "save": "true",
                     "title": title,
                     "poster": poster,
                     "data": data,
                 },
-            ).json()["hash"]
-
-    def add_torrent_obj(self, obj, title="", poster="", data=""):
-        return self._post(
+            ),
             "/torrent/upload",
-            files={"file": obj},
-            data={
-                "save": "true",
-                "title": title,
-                "poster": poster,
-                "data": data,
-            },
-        ).json()["hash"]
+        )["hash"]
 
     def torrents(self):
         """read info about all torrents (doesn't fill file_stats info)"""
-        return self._post("/torrents", data=dumps({"action": "list"})).json()
+        return self._parse_json_response(
+            self._post("/torrents", data=dumps({"action": "list"})), "/torrents"
+        )
 
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""
-        return self._post(
-            "/torrents", data=dumps({"action": "get", "hash": hash})
-        ).json()
+        return self._parse_json_response(
+            self._post("/torrents", data=dumps({"action": "get", "hash": hash})),
+            "/torrents",
+        )
 
     def get_torrent_info(self, link):
         """read extended info of one torrent"""
-        return self._get("/stream", params={"link": link, "stat": "true"}).json()
+        return self._parse_json_response(
+            self._get("/stream", params={"link": link, "stat": "true"}),
+            "/stream",
+        )
 
     def get_torrent_file_info(self, link, file_index=1):
         """read extended info of file of torrent"""
-        return self._get(
-            "/stream", params={"link": link, "index": file_index, "stat": "true"}
-        ).json()
+        return self._parse_json_response(
+            self._get(
+                "/stream",
+                params={"link": link, "index": file_index, "stat": "true"},
+            ),
+            "/stream",
+        )
 
     def drop_torrent(self, hash):
         return self._post("/torrents", data=dumps({"action": "drop", "hash": hash}))
@@ -121,7 +140,31 @@ class TorrServer(object):
 
     def get_settings(self):
         res = self._post("/settings", data=dumps({"action": "get"}))
-        return res.json()
+        return self._parse_json_response(res, "/settings")
+
+    def _parse_json_response(self, response, endpoint):
+        status_code = getattr(response, "status_code", None)
+        text = getattr(response, "text", "") or ""
+        snippet = text[:200].strip().replace("\n", " ")
+
+        if status_code != 200:
+            raise TorrServerError(
+                "TorrServer {} returned HTTP {}{}".format(
+                    endpoint,
+                    status_code,
+                    ": {}".format(snippet) if snippet else "",
+                )
+            )
+
+        try:
+            return response.json()
+        except ValueError:
+            raise TorrServerError(
+                "TorrServer {} returned invalid JSON{}".format(
+                    endpoint,
+                    ": {}".format(snippet) if snippet else "",
+                )
+            )
 
     def _post(self, url, **kwargs):
         return self._request("post", url, **kwargs)

@@ -4,7 +4,7 @@ from threading import Thread
 import time
 
 import requests
-from lib.torrserver.api import TorrServer
+from lib.torrserver.api import TorrServer, TorrServerError
 import routing
 from xbmc import Monitor, executebuiltin, getInfoLabel, getCondVisibility, sleep
 from xbmcgui import ListItem, DialogProgress, Dialog
@@ -372,7 +372,12 @@ def play_file(path, buffer=True):
 @query_arg("info_hash")
 @check_playable
 def play_info_hash(info_hash, buffer=True):
-    info = api.get_torrent_info(info_hash)
+    try:
+        info = api.get_torrent_info(info_hash)
+    except TorrServerError as e:
+        notification(str(e))
+        raise PlayError(str(e))
+
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
 
@@ -421,7 +426,16 @@ def wait_for_metadata(info_hash):
     progress.create(ADDON_NAME, translate(30237))
 
     try:
-        while api.get_torrent_info(info_hash).get("stat") == 1:
+        while True:
+            try:
+                info = api.get_torrent_info(info_hash)
+            except TorrServerError as e:
+                notification(str(e))
+                raise PlayError(str(e))
+
+            if info.get("stat") != 1:
+                break
+
             if monitor.waitForAbort(0.5):
                 raise PlayError("Abort requested")
             passed_time = time.time() - start_time
@@ -434,7 +448,7 @@ def wait_for_metadata(info_hash):
                 percent = 0 if percent == 100 else (percent + 5)
             progress.update(percent)
             if progress.iscanceled():
-                raise CanceledError("User canceled metadata", info_hash)
+                raise CanceledError("User canceled metadata", info_hash, "")
     finally:
         progress.close()
 
@@ -446,7 +460,12 @@ def wait_for_metadata(info_hash):
 @check_playable
 def buffer_and_play(info_hash, file_id, path):
     preload_torrent(info_hash, file_id)
-    info = api.get_torrent_info(info_hash)
+    try:
+        info = api.get_torrent_info(info_hash)
+    except TorrServerError as e:
+        notification(str(e))
+        raise PlayError(str(e))
+
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
     wait_for_buffering_completion(info_hash, file_id)
@@ -460,7 +479,12 @@ def preload_torrent(info_hash, file_id):
 
 def wait_for_buffering_completion(info_hash, file_id):
     close_busy_dialog()
-    info = api.get_torrent_file_info(info_hash, file_id)
+    try:
+        info = api.get_torrent_file_info(info_hash, file_id)
+    except TorrServerError as e:
+        notification(str(e))
+        raise PlayError(str(e))
+
     of = translate(30244)
     timeout = get_buffering_timeout()
     start_time = time.time()
@@ -472,7 +496,13 @@ def wait_for_buffering_completion(info_hash, file_id):
     try:
         while True:
             current_time = time.time()
-            status = api.get_torrent_file_info(info_hash, file_id)
+            try:
+                status = api.get_torrent_file_info(info_hash, file_id)
+            except TorrServerError as e:
+                notification(str(e))
+                api.drop_torrent(info_hash)
+                raise PlayError(str(e))
+
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
             seeds = status.get("connected_seeders", 0)
