@@ -50,7 +50,7 @@ WINDOW_HOME = 10000
 WINDOW_FULLSCREEN_VIDEO = 12005
 
 
-def notification(message, heading=ADDON_NAME, icon=ADDON_ICON, time=3000, sound=True):
+def notification(message, heading=ADDON_NAME, icon=ADDON_ICON, time=2000, sound=True):
     xbmcgui.Dialog().notification(heading, message, icon, time, sound)
 
 

@@ -172,7 +172,7 @@ def handle_player_stop(info_hash, name, initial_delay=0.5, listing_timeout=10):
     ):
         sleep(100)
 
-    remove_torrent = Dialog().yesno(ADDON_NAME, name + "\n" + translate(30241))
+    remove_torrent = Dialog().yesno(translate(30242), translate(30241))
     if remove_torrent:
         api.remove_torrent(info_hash)
         current_folder = getInfoLabel("Container.FolderPath")
