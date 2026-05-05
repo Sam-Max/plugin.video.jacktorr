@@ -347,7 +347,11 @@ def display_text(info_hash, file_id, path):
 @query_arg("url")
 @check_playable
 def play_url(url, buffer=True):
-    r = requests.get(url, stream=True)
+    try:
+        r = requests.get(url, stream=True, timeout=30)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        raise PlayError("Failed to download torrent: {}".format(e))
     info_hash = api.add_torrent_obj(r.raw)
     play_info_hash(info_hash=info_hash, buffer=buffer)
 

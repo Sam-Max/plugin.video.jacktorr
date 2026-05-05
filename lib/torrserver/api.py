@@ -157,7 +157,7 @@ class TorrServer(object):
             )
 
         try:
-            return response.json()
+            result = response.json()
         except ValueError:
             raise TorrServerError(
                 "TorrServer {} returned invalid JSON{}".format(
@@ -165,6 +165,18 @@ class TorrServer(object):
                     ": {}".format(snippet) if snippet else "",
                 )
             )
+
+        # Some TorrServer versions return a list instead of a dict.
+        # Normalize by taking the first element so callers can always
+        # access keys like ["hash"] without type errors.
+        if isinstance(result, list):
+            if not result:
+                raise TorrServerError(
+                    "TorrServer {} returned empty list".format(endpoint)
+                )
+            result = result[0]
+
+        return result
 
     def _post(self, url, **kwargs):
         return self._request("post", url, **kwargs)
