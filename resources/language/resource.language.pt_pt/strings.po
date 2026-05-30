@@ -290,6 +290,10 @@ msgctxt "#30084"
 msgid "Piece expiration time"
 msgstr "Tempo de validade de peça"
 
+msgctxt "#30085"
+msgid "Apply settings to TorrServer"
+msgstr "Aplicar configurações ao TorrServer"
+
 # Service
 msgctxt "#30100"
 msgid "Jacktorr - first run"

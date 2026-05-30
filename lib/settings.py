@@ -38,6 +38,10 @@ def service_enabled():
     return get_boolean_setting("service_enabled")
 
 
+def apply_settings_to_torrserver():
+    return get_boolean_setting("apply_settings_to_torrserver")
+
+
 def set_service_enabled(value):
     set_boolean_setting("service_enabled", value)
 
@@ -56,5 +60,3 @@ def get_password():
 
 def get_files_order():
     return get_int_setting("files_order")
-
-

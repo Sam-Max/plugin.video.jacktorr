@@ -7,6 +7,7 @@
         <setting id="ssl_connection" type="bool" label="30031" default="false"/>
 		<setting id="service_login" label="30005" type="text" default="" />
 		<setting id="service_password" label="30006" type="text" option="hidden" default="" />
+        <setting id="apply_settings_to_torrserver" type="bool" label="30085" default="false"/>
         <setting id="files_order" type="enum" label="30064" default="0" lvalues="30065|30066|30067"/>
         <setting id="overlay" type="bool" label="30004" default="true"/>
         <setting id="metadata_timeout" type="slider" label="30081" option="int" range="0,10,120" default="30"/>

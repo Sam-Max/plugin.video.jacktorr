@@ -210,6 +210,10 @@ msgctxt "#30081"
 msgid "Metadata timeout"
 msgstr ""
 
+msgctxt "#30085"
+msgid "Apply settings to TorrServer"
+msgstr ""
+
 # Service
 msgctxt "#30100"
 msgid "JackTorr - First run"

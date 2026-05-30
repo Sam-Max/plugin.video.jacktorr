@@ -14,6 +14,7 @@ from lib.settings import (
     get_port,
     get_service_host,
     get_username,
+    apply_settings_to_torrserver,
     service_enabled,
     ssl_enabled,
 )
@@ -98,6 +99,9 @@ class DaemonMonitor(xbmc.Monitor):
         return True
 
     def _update_daemon_settings(self):
+        if not apply_settings_to_torrserver():
+            return True
+
         daemon_settings = self._get_daemon_settings()
         if daemon_settings is None:
             return False
