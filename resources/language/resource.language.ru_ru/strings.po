@@ -1,0 +1,317 @@
+# Kodi Media Center language file
+# Addon Name: JackTorr
+# Addon id: plugin.video.jacktorr
+# Addon Provider: Sam-Max
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+# Settings
+msgctxt "#30000"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "#30001"
+msgid "Service port"
+msgstr "Порт службы"
+
+msgctxt "#30003"
+msgid "Buffering timeout"
+msgstr "Тайм-аут буферизации"
+
+msgctxt "#30004"
+msgid "Show status overlay"
+msgstr "Показывать оверлей состояния"
+
+msgctxt "#30005"
+msgid "Login"
+msgstr "Логин"
+
+msgctxt "#30006"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "#30010"
+msgid "Download path"
+msgstr "Путь загрузки"
+
+msgctxt "#30011"
+msgid "Connections limit"
+msgstr "Лимит соединений"
+
+msgctxt "#30012"
+msgid "Cache size (MB)"
+msgstr "Размер кэша (МБ)"
+
+msgctxt "#30013"
+msgid "ReaderReadAHead"
+msgstr "ReaderReadAHead"
+
+msgctxt "#30014"
+msgid "Preload Cache (%)"
+msgstr "Предзагрузка кэша (%)"
+
+msgctxt "#30016"
+msgid "Disable DHT"
+msgstr "Отключить DHT"
+
+msgctxt "#30017"
+msgid "Disable UPNP"
+msgstr "Отключить UPNP"
+
+msgctxt "#30018"
+msgid "Enable IPv6"
+msgstr "Включить IPv6"
+
+msgctxt "#30031"
+msgid "Ssl Connection"
+msgstr "SSL-соединение"
+
+msgctxt "#30032"
+msgid "Not add"
+msgstr "Не добавлять"
+
+msgctxt "#30033"
+msgid "Add"
+msgstr "Добавить"
+
+msgctxt "#30034"
+msgid "Max download rate (B/s)"
+msgstr "Макс. скорость загрузки (Б/с)"
+
+msgctxt "#30035"
+msgid "Max upload rate (B/s)"
+msgstr "Макс. скорость отдачи (Б/с)"
+
+msgctxt "#30036"
+msgid "Peers Listen Port"
+msgstr "Порт прослушивания пиров"
+
+msgctxt "#30037"
+msgid "DhtConnectionLimit"
+msgstr "Лимит соединений DHT"
+
+msgctxt "#30038"
+msgid "TorrentDisconnectTimeout"
+msgstr "Тайм-аут отключения торрента"
+
+msgctxt "#30039"
+msgid "Force Encrypt"
+msgstr "Принудительное шифрование"
+
+msgctxt "#30040"
+msgid "Remove"
+msgstr "Удалить"
+
+msgctxt "#30041"
+msgid "Replace"
+msgstr "Заменить"
+
+msgctxt "#30043"
+msgid "Disable TCP"
+msgstr "Отключить TCP"
+
+msgctxt "#30044"
+msgid "Disable UTP"
+msgstr "Отключить UTP"
+
+msgctxt "#30045"
+msgid "Disable PEX"
+msgstr "Отключить PEX"
+
+msgctxt "#30046"
+msgid "Disable Upload"
+msgstr "Отключить отдачу"
+
+msgctxt "#30047"
+msgid "RetrackersMode"
+msgstr "Режим ретрекеров"
+
+msgctxt "#30048"
+msgid "Use Disk"
+msgstr "Использовать диск"
+
+msgctxt "#30049"
+msgid "RemoveCacheOnDrop"
+msgstr "Удалять кэш при сбросе"
+
+msgctxt "#30050"
+msgid "Enable Debug"
+msgstr "Включить отладку"
+
+msgctxt "#30051"
+msgid "Host"
+msgstr "Хост"
+
+msgctxt "#30052"
+msgid "Port"
+msgstr "Порт"
+
+msgctxt "#30053"
+msgid "Login"
+msgstr "Логин"
+
+msgctxt "#30054"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "#30055"
+msgid "Minimum video candidate size (MB)"
+msgstr "Минимальный размер видео-кандидата (МБ)"
+
+msgctxt "#30056"
+msgid "Ask to remove torrent after streaming"
+msgstr "Спрашивать об удалении торрента после просмотра"
+
+msgctxt "#30059"
+msgid "Enable Service"
+msgstr "Включить службу"
+
+msgctxt "#30060"
+msgid "Service address"
+msgstr "Адрес службы"
+
+msgctxt "#30064"
+msgid "Order files by"
+msgstr "Сортировать файлы по"
+
+msgctxt "#30065"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "#30066"
+msgid "Name"
+msgstr "Имени"
+
+msgctxt "#30067"
+msgid "Size"
+msgstr "Размеру"
+
+msgctxt "#30071"
+msgid "Enable DLNA"
+msgstr "Включить DLNA"
+
+msgctxt "#30072"
+msgid "Enable RutorSearch"
+msgstr "Включить RutorSearch"
+
+msgctxt "#30081"
+msgid "Metadata timeout"
+msgstr "Тайм-аут метаданных"
+
+msgctxt "#30085"
+msgid "Apply settings to TorrServer"
+msgstr "Применить настройки к TorrServer"
+
+# Service
+msgctxt "#30100"
+msgid "JackTorr - First run"
+msgstr "JackTorr - первый запуск"
+
+msgctxt "#30101"
+msgid "Please set the server configuration so you can properly use JackTorr. Feel free to also change any other settings."
+msgstr "Настройте параметры сервера, чтобы правильно использовать JackTorr. При необходимости измените и другие настройки."
+
+msgctxt "#30102"
+msgid "Error..."
+msgstr "Ошибка..."
+
+# Plugin
+msgctxt "#30200"
+msgid "Insert file or URL"
+msgstr "Укажите файл или URL"
+
+msgctxt "#30201"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "#30202"
+msgid "File"
+msgstr "Файл"
+
+msgctxt "#30203"
+msgid "Insert URL:"
+msgstr "Введите URL:"
+
+msgctxt "#30204"
+msgid "File path:"
+msgstr "Путь к файлу:"
+
+msgctxt "#30205"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30206"
+msgid "Torrents"
+msgstr "Торренты"
+
+msgctxt "#30207"
+msgid "Add torrent/magnet"
+msgstr "Добавить torrent/magnet"
+
+msgctxt "#30208"
+msgid "Drop torrent"
+msgstr "Удалить торрент"
+
+msgctxt "#30209"
+msgid "Download"
+msgstr "Скачать"
+
+msgctxt "#30230"
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgctxt "#30235"
+msgid "Buffer and play"
+msgstr "Буферизовать и воспроизвести"
+
+msgctxt "#30236"
+msgid "Timeout reached"
+msgstr "Истекло время ожидания"
+
+msgctxt "#30237"
+msgid "Waiting for metadata"
+msgstr "Ожидание метаданных"
+
+msgctxt "#30238"
+msgid "Timed out waiting for metadata"
+msgstr "Истекло время ожидания метаданных"
+
+msgctxt "#30239"
+msgid "No candidate files found"
+msgstr "Подходящие файлы не найдены"
+
+msgctxt "#30240"
+msgid "Please choose what file to play"
+msgstr "Выберите файл для воспроизведения"
+
+msgctxt "#30241"
+msgid "Remove this torrent from JackTorr?"
+msgstr "Удалить этот торрент из JackTorr?"
+
+msgctxt "#30242"
+msgid "Remove torrent"
+msgstr "Удалить торрент"
+
+msgctxt "#30243"
+msgid "Torrent added successfully"
+msgstr "Торрент успешно добавлен"
+
+msgctxt "#30244"
+msgid "of"
+msgstr "из"
+
+msgctxt "#30245"
+msgid "Torrent status"
+msgstr "Статус торрента"

@@ -1,0 +1,317 @@
+# Kodi Media Center language file
+# Addon Name: JackTorr
+# Addon id: plugin.video.jacktorr
+# Addon Provider: Sam-Max
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+
+# Settings
+msgctxt "#30000"
+msgid "General"
+msgstr "General"
+
+msgctxt "#30001"
+msgid "Service port"
+msgstr "Port serviciu"
+
+msgctxt "#30003"
+msgid "Buffering timeout"
+msgstr "Timp limită pentru buffer"
+
+msgctxt "#30004"
+msgid "Show status overlay"
+msgstr "Afișează suprapunerea de stare"
+
+msgctxt "#30005"
+msgid "Login"
+msgstr "Autentificare"
+
+msgctxt "#30006"
+msgid "Password"
+msgstr "Parolă"
+
+msgctxt "#30010"
+msgid "Download path"
+msgstr "Cale descărcare"
+
+msgctxt "#30011"
+msgid "Connections limit"
+msgstr "Limită conexiuni"
+
+msgctxt "#30012"
+msgid "Cache size (MB)"
+msgstr "Dimensiune cache (MB)"
+
+msgctxt "#30013"
+msgid "ReaderReadAHead"
+msgstr "ReaderReadAHead"
+
+msgctxt "#30014"
+msgid "Preload Cache (%)"
+msgstr "Preîncărcare cache (%)"
+
+msgctxt "#30016"
+msgid "Disable DHT"
+msgstr "Dezactivează DHT"
+
+msgctxt "#30017"
+msgid "Disable UPNP"
+msgstr "Dezactivează UPNP"
+
+msgctxt "#30018"
+msgid "Enable IPv6"
+msgstr "Activează IPv6"
+
+msgctxt "#30031"
+msgid "Ssl Connection"
+msgstr "Conexiune SSL"
+
+msgctxt "#30032"
+msgid "Not add"
+msgstr "Nu adăuga"
+
+msgctxt "#30033"
+msgid "Add"
+msgstr "Adaugă"
+
+msgctxt "#30034"
+msgid "Max download rate (B/s)"
+msgstr "Rată maximă descărcare (B/s)"
+
+msgctxt "#30035"
+msgid "Max upload rate (B/s)"
+msgstr "Rată maximă încărcare (B/s)"
+
+msgctxt "#30036"
+msgid "Peers Listen Port"
+msgstr "Port ascultare peers"
+
+msgctxt "#30037"
+msgid "DhtConnectionLimit"
+msgstr "Limită conexiuni DHT"
+
+msgctxt "#30038"
+msgid "TorrentDisconnectTimeout"
+msgstr "Timp limită deconectare torrent"
+
+msgctxt "#30039"
+msgid "Force Encrypt"
+msgstr "Forțează criptarea"
+
+msgctxt "#30040"
+msgid "Remove"
+msgstr "Elimină"
+
+msgctxt "#30041"
+msgid "Replace"
+msgstr "Înlocuiește"
+
+msgctxt "#30043"
+msgid "Disable TCP"
+msgstr "Dezactivează TCP"
+
+msgctxt "#30044"
+msgid "Disable UTP"
+msgstr "Dezactivează UTP"
+
+msgctxt "#30045"
+msgid "Disable PEX"
+msgstr "Dezactivează PEX"
+
+msgctxt "#30046"
+msgid "Disable Upload"
+msgstr "Dezactivează încărcarea"
+
+msgctxt "#30047"
+msgid "RetrackersMode"
+msgstr "Mod retrackere"
+
+msgctxt "#30048"
+msgid "Use Disk"
+msgstr "Folosește discul"
+
+msgctxt "#30049"
+msgid "RemoveCacheOnDrop"
+msgstr "Elimină cache-ul la abandonare"
+
+msgctxt "#30050"
+msgid "Enable Debug"
+msgstr "Activează depanarea"
+
+msgctxt "#30051"
+msgid "Host"
+msgstr "Gazdă"
+
+msgctxt "#30052"
+msgid "Port"
+msgstr "Port"
+
+msgctxt "#30053"
+msgid "Login"
+msgstr "Autentificare"
+
+msgctxt "#30054"
+msgid "Password"
+msgstr "Parolă"
+
+msgctxt "#30055"
+msgid "Minimum video candidate size (MB)"
+msgstr "Dimensiune minimă candidat video (MB)"
+
+msgctxt "#30056"
+msgid "Ask to remove torrent after streaming"
+msgstr "Întreabă dacă torrentul trebuie eliminat după redare"
+
+msgctxt "#30059"
+msgid "Enable Service"
+msgstr "Activează serviciul"
+
+msgctxt "#30060"
+msgid "Service address"
+msgstr "Adresă serviciu"
+
+msgctxt "#30064"
+msgid "Order files by"
+msgstr "Ordonează fișierele după"
+
+msgctxt "#30065"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "#30066"
+msgid "Name"
+msgstr "Nume"
+
+msgctxt "#30067"
+msgid "Size"
+msgstr "Dimensiune"
+
+msgctxt "#30071"
+msgid "Enable DLNA"
+msgstr "Activează DLNA"
+
+msgctxt "#30072"
+msgid "Enable RutorSearch"
+msgstr "Activează RutorSearch"
+
+msgctxt "#30081"
+msgid "Metadata timeout"
+msgstr "Timp limită metadate"
+
+msgctxt "#30085"
+msgid "Apply settings to TorrServer"
+msgstr "Aplică setările în TorrServer"
+
+# Service
+msgctxt "#30100"
+msgid "JackTorr - First run"
+msgstr "JackTorr - prima rulare"
+
+msgctxt "#30101"
+msgid "Please set the server configuration so you can properly use JackTorr. Feel free to also change any other settings."
+msgstr "Configurează serverul pentru a putea folosi corect JackTorr. Poți modifica liber și celelalte setări."
+
+msgctxt "#30102"
+msgid "Error..."
+msgstr "Eroare..."
+
+# Plugin
+msgctxt "#30200"
+msgid "Insert file or URL"
+msgstr "Introdu fișier sau URL"
+
+msgctxt "#30201"
+msgid "URL"
+msgstr "URL"
+
+msgctxt "#30202"
+msgid "File"
+msgstr "Fișier"
+
+msgctxt "#30203"
+msgid "Insert URL:"
+msgstr "Introdu URL:"
+
+msgctxt "#30204"
+msgid "File path:"
+msgstr "Cale fișier:"
+
+msgctxt "#30205"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "#30206"
+msgid "Torrents"
+msgstr "Torrente"
+
+msgctxt "#30207"
+msgid "Add torrent/magnet"
+msgstr "Adaugă torrent/magnet"
+
+msgctxt "#30208"
+msgid "Drop torrent"
+msgstr "Elimină torrentul"
+
+msgctxt "#30209"
+msgid "Download"
+msgstr "Descarcă"
+
+msgctxt "#30230"
+msgid "Unknown"
+msgstr "Necunoscut"
+
+msgctxt "#30235"
+msgid "Buffer and play"
+msgstr "Buffer și redare"
+
+msgctxt "#30236"
+msgid "Timeout reached"
+msgstr "Timpul limită a fost atins"
+
+msgctxt "#30237"
+msgid "Waiting for metadata"
+msgstr "Se așteaptă metadatele"
+
+msgctxt "#30238"
+msgid "Timed out waiting for metadata"
+msgstr "Timpul de așteptare pentru metadate a expirat"
+
+msgctxt "#30239"
+msgid "No candidate files found"
+msgstr "Nu s-au găsit fișiere candidate"
+
+msgctxt "#30240"
+msgid "Please choose what file to play"
+msgstr "Alege fișierul de redat"
+
+msgctxt "#30241"
+msgid "Remove this torrent from JackTorr?"
+msgstr "Elimini acest torrent din JackTorr?"
+
+msgctxt "#30242"
+msgid "Remove torrent"
+msgstr "Elimină torrent"
+
+msgctxt "#30243"
+msgid "Torrent added successfully"
+msgstr "Torrent adăugat cu succes"
+
+msgctxt "#30244"
+msgid "of"
+msgstr "din"
+
+msgctxt "#30245"
+msgid "Torrent status"
+msgstr "Stare torrent"
