@@ -563,7 +563,13 @@ def wait_for_buffering_completion(info_hash, file_id):
 def play(info_hash, file_id, path):
     name = path
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
-    setResolvedUrl(plugin.handle, True, ListItem(name, path=serve_url))
+    list_item = ListItem(name, path=serve_url)
+    
+    # Prevent Kodi's synchronous pre-playback external-subtitle scan from opening
+    # the TorrServer stream URL. Kodi's GetParentPath keeps the ?link=&index= query,
+    # so the "directory" scan resolves to the media itself and stalls playback.
+    list_item.setProperty("no-ext-subs-scan", "true")
+    setResolvedUrl(plugin.handle, True, list_item)
 
     try:
         with JackTorrPlayer(
