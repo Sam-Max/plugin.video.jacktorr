@@ -583,6 +583,12 @@ def play(info_hash, file_id, path, poster=""):
     item = ListItem(name, path=serve_url)
     if poster:
         item.setArt({"poster": poster})
+
+    # Prevent Kodi's synchronous pre-playback external-subtitle scan from opening
+    # the TorrServer stream URL. Kodi's GetParentPath keeps the ?link=&index= query,
+    # so the "directory" scan resolves to the media itself and stalls playback.
+    # Workaround for xbmc/xbmc#28490 (regression from xbmc/xbmc#28275).
+    item.setProperty("no-ext-subs-scan", "true")
     setResolvedUrl(plugin.handle, True, item)
 
     try:
