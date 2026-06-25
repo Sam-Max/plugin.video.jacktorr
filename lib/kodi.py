@@ -30,7 +30,10 @@ def set_info_tag(list_item, info_type, info_labels):
         tag.setTitle(info_labels.get("title"))
     elif info_type == "pictures" and hasattr(list_item, "getPictureInfoTag"):
         tag = list_item.getPictureInfoTag()
-        tag.setTitle(info_labels.get("title"))
+        if hasattr(tag, "setTitle"):
+            tag.setTitle(info_labels.get("title"))
+        else:
+            list_item.setInfo(info_type, info_labels)
     else:
         list_item.setInfo(info_type, info_labels)
 
