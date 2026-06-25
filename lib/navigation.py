@@ -97,9 +97,12 @@ def li(tid, icon):
     return list_item(translate(tid), icon)
 
 
-def list_item(label, icon):
+def list_item(label, icon, poster=None):
     item = ListItem(label)
-    item.setArt({"icon": os.path.join(ADDON_PATH, "resources", "images", icon)})
+    art = {"icon": os.path.join(ADDON_PATH, "resources", "images", icon)}
+    if poster:
+        art["poster"] = poster
+    item.setArt(art)
     return item
 
 
@@ -227,7 +230,7 @@ def torrents():
             ]
         )
 
-        torrent_li = list_item(torrent.get("title", ""), "download.png")
+        torrent_li = list_item(torrent.get("title", ""), "download.png", poster=torrent.get("poster"))
         torrent_li.addContextMenuItems(context_menu_items)
         addDirectoryItem(
             plugin.handle,
@@ -268,6 +271,15 @@ def file_action(info_hash, file_id, action_str):
     refresh()
 
 
+@plugin.route("/set_poster")
+@query_arg("info_hash")
+@query_arg("poster")
+def set_poster(info_hash, poster):
+    api.set_torrent(info_hash, poster=poster)
+    notification(translate(30243), time=2000)
+    refresh()
+
+
 def torrent_status(info_hash):
     status = api.get_torrent_info(link=info_hash)
     notification(
@@ -295,7 +307,7 @@ def torrent_files(info_hash):
         name = f.get("path")
         id = f.get("id")
         serve_url = api.get_stream_url(link=info_hash, path=f.get("path"), file_id=id)
-        file_li = list_item(name, "download.png")
+        file_li = list_item(name, "download.png", poster=info.get("poster"))
         file_li.setPath(serve_url)
 
         context_menu_items = []
@@ -345,30 +357,33 @@ def display_text(info_hash, file_id, path):
 
 @plugin.route("/play_url")
 @query_arg("url")
+@query_arg("poster", required=False)
 @check_playable
-def play_url(url, buffer=True):
+def play_url(url, buffer=True, poster=""):
     try:
         r = requests.get(url, stream=True, timeout=30)
         r.raise_for_status()
     except requests.RequestException as e:
         raise PlayError("Failed to download torrent: {}".format(e))
-    info_hash = api.add_torrent_obj(r.raw)
+    info_hash = api.add_torrent_obj(r.raw, poster=poster)
     play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
 @plugin.route("/play_magnet")
 @query_arg("magnet")
+@query_arg("poster", required=False)
 @check_playable
-def play_magnet(magnet, buffer=True):
-    info_hash = api.add_magnet(magnet)
+def play_magnet(magnet, buffer=True, poster=""):
+    info_hash = api.add_magnet(magnet, poster=poster)
     play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
 @plugin.route("/play_path")
 @query_arg("path")
+@query_arg("poster", required=False)
 @check_playable
-def play_file(path, buffer=True):
-    info_hash = api.add_torrent(path)
+def play_file(path, buffer=True, poster=""):
+    info_hash = api.add_torrent(path, poster=poster)
     play_info_hash(info_hash=info_hash, buffer=buffer)
 
 
@@ -473,7 +488,8 @@ def buffer_and_play(info_hash, file_id, path):
     if info.get("stat") == 1:
         wait_for_metadata(info_hash)
     wait_for_buffering_completion(info_hash, file_id)
-    play(info_hash=info_hash, file_id=file_id, path=path)
+    poster = info.get("poster")
+    play(info_hash=info_hash, file_id=file_id, path=path, poster=poster)
 
 
 def preload_torrent(info_hash, file_id):
@@ -559,11 +575,15 @@ def wait_for_buffering_completion(info_hash, file_id):
 @query_arg("info_hash")
 @query_arg("file_id")
 @query_arg("path")
+@query_arg("poster", required=False)
 @check_playable
-def play(info_hash, file_id, path):
+def play(info_hash, file_id, path, poster=""):
     name = path
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
-    setResolvedUrl(plugin.handle, True, ListItem(name, path=serve_url))
+    item = ListItem(name, path=serve_url)
+    if poster:
+        item.setArt({"poster": poster})
+    setResolvedUrl(plugin.handle, True, item)
 
     try:
         with JackTorrPlayer(

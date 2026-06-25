@@ -88,6 +88,22 @@ class TorrServer(object):
             "/torrents",
         )
 
+    def set_torrent(self, hash, title=None, poster=None, category=None, data=None):
+        """update torrent metadata (title/poster/category) via the 'set' action"""
+        payload = {"action": "set", "hash": hash}
+        if title is not None:
+            payload["title"] = title
+        if poster is not None:
+            payload["poster"] = poster
+        if category is not None:
+            payload["category"] = category
+        if data is not None:
+            payload["data"] = data
+        return self._parse_json_response(
+            self._post("/torrents", data=dumps(payload)),
+            "/torrents",
+        )
+
     def get_torrent_info(self, link):
         """read extended info of one torrent"""
         return self._parse_json_response(

@@ -201,3 +201,46 @@ class TestGetTorrentInfo:
         torrserver._session.request.return_value = _make_response([expected_inner])
         result = torrserver.get_torrent_info_by_hash("abc123")
         assert result == expected_inner
+
+
+class TestSetTorrent:
+    """Tests for TorrServer.set_torrent (issue #7 Part B1)."""
+
+    def test_set_poster_sends_set_action_with_poster(self, torrserver):
+        torrserver._session.request.return_value = _make_response(
+            {"hash": "abc", "poster": "http://example.com/p.jpg"}
+        )
+        result = torrserver.set_torrent("abc", poster="http://example.com/p.jpg")
+        assert result == {"hash": "abc", "poster": "http://example.com/p.jpg"}
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert sent_data["action"] == "set"
+        assert sent_data["hash"] == "abc"
+        assert sent_data["poster"] == "http://example.com/p.jpg"
+
+    def test_set_torrent_omits_none_fields(self, torrserver):
+        torrserver._session.request.return_value = _make_response({"hash": "abc"})
+        torrserver.set_torrent("abc", poster="http://example.com/p.jpg")
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert "title" not in sent_data
+        assert "category" not in sent_data
+        assert "data" not in sent_data
+
+    def test_set_torrent_list_response(self, torrserver):
+        torrserver._session.request.return_value = _make_response(
+            [{"hash": "abc", "poster": "http://example.com/p.jpg"}]
+        )
+        result = torrserver.set_torrent("abc", poster="http://example.com/p.jpg")
+        assert result == {"hash": "abc", "poster": "http://example.com/p.jpg"}
+
+
+class TestAddMagnetPoster:
+    """Regression: add_magnet forwards poster to TorrServer (issue #7 Part B1)."""
+
+    def test_add_magnet_includes_poster_in_payload(self, torrserver):
+        torrserver._session.request.return_value = _make_response({"hash": "h1"})
+        torrserver.add_magnet(
+            "magnet:?xt=urn:btih:abc123", poster="http://example.com/p.jpg"
+        )
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert sent_data["action"] == "add"
+        assert sent_data["poster"] == "http://example.com/p.jpg"
