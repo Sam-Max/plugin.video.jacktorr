@@ -22,7 +22,7 @@ from lib.kodi import (
     close_busy_dialog,
     set_info_tag,
 )
-from lib.kodi_formats import is_music, is_picture, is_video, is_text
+from lib.kodi_formats import is_music, is_picture, is_video, is_text, strip_common_folder_prefix
 from lib.player import JackTorrPlayer
 from lib.settings import (
     get_password,
@@ -302,12 +302,13 @@ def sort_files(files):
 def torrent_files(info_hash):
     info = api.get_torrent_info(link=info_hash)
     file_stats = info.get("file_stats")
+    display_names = strip_common_folder_prefix(file_stats)
 
-    for f in file_stats:
+    for f, display_name in zip(file_stats, display_names):
         name = f.get("path")
         id = f.get("id")
         serve_url = api.get_stream_url(link=info_hash, path=f.get("path"), file_id=id)
-        file_li = list_item(name, "download.png", poster=info.get("poster"))
+        file_li = list_item(display_name, "download.png", poster=info.get("poster"))
         file_li.setPath(serve_url)
 
         context_menu_items = []
@@ -414,8 +415,9 @@ def play_info_hash(info_hash, buffer=True):
         chosen_file = candidate_files[0]
     else:
         sort_files(candidate_files)
+        display_names = strip_common_folder_prefix(candidate_files)
         chosen_index = Dialog().select(
-            translate(30240), [f.get("path") for f in candidate_files]
+            translate(30240), display_names
         )
         if chosen_index < 0:
             raise PlayError("User canceled dialog select")
