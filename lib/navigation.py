@@ -22,7 +22,14 @@ from lib.kodi import (
     close_busy_dialog,
     set_info_tag,
 )
-from lib.kodi_formats import is_music, is_picture, is_video, is_text, strip_common_folder_prefix
+from lib.kodi_formats import (
+    is_music,
+    is_picture,
+    is_video,
+    is_text,
+    is_displayable,
+    strip_common_folder_prefix,
+)
 from lib.player import JackTorrPlayer
 from lib.settings import (
     get_password,
@@ -302,6 +309,7 @@ def sort_files(files):
 def torrent_files(info_hash):
     info = api.get_torrent_info(link=info_hash)
     file_stats = info.get("file_stats")
+    file_stats = [f for f in file_stats if is_displayable(f.get("path", ""))]
     display_names = strip_common_folder_prefix(file_stats)
 
     for f, display_name in zip(file_stats, display_names):
