@@ -214,6 +214,12 @@ def index():
         li(30207, "add.png"),
         isFolder=False,
     )
+    addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(search),
+        li(30255, "download.png"),
+        isFolder=True,
+    )
 
 
 @plugin.route("/torrents")
@@ -244,6 +250,13 @@ def torrents():
             ]
         )
 
+        context_menu_items.append(
+            (translate(30248), action(torrent_action, info_hash, "set_poster"))
+        )
+        context_menu_items.append(
+            (translate(30250), action(torrent_action, info_hash, "set_category"))
+        )
+
         torrent_li = list_item(torrent.get("title", ""), "download.png", poster=torrent.get("poster"))
         torrent_li.addContextMenuItems(context_menu_items)
         addDirectoryItem(
@@ -265,12 +278,63 @@ def torrent_action(info_hash, action_str):
     elif action_str == "torrent_status":
         torrent_status(info_hash)
         needs_refresh = False
+    elif action_str == "set_poster":
+        poster_url = Dialog().input(translate(30249))
+        if poster_url:
+            api.set_torrent(info_hash, poster=poster_url)
+        else:
+            needs_refresh = False
+    elif action_str == "set_category":
+        category = Dialog().input(translate(30251))
+        if category:
+            api.set_torrent(info_hash, category=category)
+        else:
+            needs_refresh = False
     else:
         logging.error("Unknown action '%s'", action_str)
         needs_refresh = False
 
     if needs_refresh:
         refresh()
+
+
+@plugin.route("/search")
+@check_directory
+def search():
+    # TorrServer /search/?query=... returns a JSON list of Rutor results.
+    # Search must be enabled in TorrServer (EnableRutorSearch=true); when it
+    # is disabled or yields nothing, the endpoint returns [].
+    query = Dialog().input(translate(30252))
+    if not query:
+        return
+    try:
+        results = api.search(query)
+    except TorrServerError as e:
+        notification(str(e))
+        return
+    if not results:
+        notification(translate(30253))
+        return
+    for r in results:
+        magnet = r.get("Magnet", "")
+        if not magnet:
+            continue
+        title = r.get("Title", "") or r.get("Name", "")
+        size = r.get("Size", "")
+        # Size is a human-readable string ("42.93 GB"), not bytes.
+        label = "{} ({})".format(title, size) if size else title
+        item = list_item(label, "download.png")
+        # Context menu: Play — add the magnet and play directly (play_magnet
+        # calls api.add_magnet then play_info_hash).
+        context_menu_items = [
+            (translate(30254), media(play_magnet, magnet=magnet, poster=""))
+        ]
+        item.addContextMenuItems(context_menu_items)
+        # Clicking the item triggers play_magnet (add + play directly), the
+        # user-chosen "Añadir y reproducir directo" flow. isFolder=False so
+        # Kodi treats it as a playable item, not a subdirectory.
+        url = plugin.url_for(play_magnet, magnet=magnet, buffer=True, poster="")
+        addDirectoryItem(plugin.handle, url, item, isFolder=False)
 
 
 @plugin.route("/torrents/<info_hash>/files/<file_id>/<action_str>")

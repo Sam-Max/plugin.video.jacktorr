@@ -81,6 +81,20 @@ class TorrServer(object):
             )
         return response.json()
 
+    def search(self, query):
+        """search torrents via Rutor (GET /search/?query=...).
+
+        Requires EnableRutorSearch=true in TorrServer settings. Returns the
+        raw JSON list from TorrServer. Empty list when search is disabled or
+        no results — do NOT use _parse_json_response (it raises on empty list).
+        """
+        response = self._get("/search/", params={"query": query})
+        if response.status_code != 200:
+            raise TorrServerError(
+                "TorrServer /search returned HTTP {}".format(response.status_code)
+            )
+        return response.json()
+
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""
         return self._parse_json_response(

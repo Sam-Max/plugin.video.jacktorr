@@ -471,3 +471,35 @@ msgstr "Descargar archivo"
 msgctxt "#30247"
 msgid "TorrServer unreachable — check settings"
 msgstr "TorrServer no disponible — revisa los ajustes"
+
+msgctxt "#30248"
+msgid "Set poster"
+msgstr "Definir poster"
+
+msgctxt "#30249"
+msgid "Enter poster URL"
+msgstr "Introduce la URL del poster"
+
+msgctxt "#30250"
+msgid "Set category"
+msgstr "Definir categoría"
+
+msgctxt "#30251"
+msgid "Enter category"
+msgstr "Introduce la categoría"
+
+msgctxt "#30252"
+msgid "Search torrents"
+msgstr "Buscar torrents"
+
+msgctxt "#30253"
+msgid "No results (check that Rutor search is enabled in TorrServer)"
+msgstr "Sin resultados (verifica que la búsqueda Rutor esté activa en TorrServer)"
+
+msgctxt "#30254"
+msgid "Play"
+msgstr "Reproducir"
+
+msgctxt "#30255"
+msgid "Search"
+msgstr "Buscar"

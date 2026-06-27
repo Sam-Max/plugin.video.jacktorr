@@ -323,3 +323,35 @@ msgstr ""
 msgctxt "#30247"
 msgid "TorrServer unreachable — check settings"
 msgstr ""
+
+msgctxt "#30248"
+msgid "Set poster"
+msgstr ""
+
+msgctxt "#30249"
+msgid "Enter poster URL"
+msgstr ""
+
+msgctxt "#30250"
+msgid "Set category"
+msgstr ""
+
+msgctxt "#30251"
+msgid "Enter category"
+msgstr ""
+
+msgctxt "#30252"
+msgid "Search torrents"
+msgstr ""
+
+msgctxt "#30253"
+msgid "No results (check that Rutor search is enabled in TorrServer)"
+msgstr ""
+
+msgctxt "#30254"
+msgid "Play"
+msgstr ""
+
+msgctxt "#30255"
+msgid "Search"
+msgstr ""

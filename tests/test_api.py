@@ -233,6 +233,22 @@ class TestSetTorrent:
         assert result == {"hash": "abc", "poster": "http://example.com/p.jpg"}
 
 
+class TestSetTorrentCategory:
+    """Tests for TorrServer.set_torrent category kwarg (Phase 5)."""
+
+    def test_set_category_sends_set_action_with_category(self, torrserver):
+        torrserver._session.request.return_value = _make_response({"ok": True})
+        torrserver.set_torrent("abc", category="movies")
+        call = torrserver._session.request.call_args
+        assert call.args[0] == "post"
+        sent_data = json.loads(call.kwargs["data"])
+        assert sent_data["action"] == "set"
+        assert sent_data["hash"] == "abc"
+        assert sent_data["category"] == "movies"
+        assert "poster" not in sent_data
+        assert "title" not in sent_data
+
+
 class TestAddMagnetPoster:
     """Regression: add_magnet forwards poster to TorrServer (issue #7 Part B1)."""
 
@@ -271,3 +287,32 @@ class TestDropTorrent:
         assert call.args[1] == "http://localhost:8090/torrents"
         sent_data = json.loads(call.kwargs["data"])
         assert sent_data == {"action": "drop", "hash": "abc"}
+
+
+class TestSearch:
+    """Tests for TorrServer.search (GET /search/?query=...)."""
+
+    def test_search_returns_raw_list(self, torrserver):
+        """search issues a GET to /search/ with the query param and returns the raw list."""
+        torrserver._session.request.return_value = _make_response(
+            [{"Title": "X", "Magnet": "magnet:..."}]
+        )
+        result = torrserver.search("matrix")
+        assert isinstance(result, list)
+        assert result[0]["Title"] == "X"
+        call = torrserver._session.request.call_args
+        assert call.args[0] == "get"
+        assert "/search/" in call.args[1]
+        assert call.kwargs["params"] == {"query": "matrix"}
+
+    def test_search_empty_list_when_no_results(self, torrserver):
+        """search returns [] — must NOT raise (unlike _parse_json_response)."""
+        torrserver._session.request.return_value = _make_response([])
+        result = torrserver.search("nothing")
+        assert result == []
+
+    def test_search_raises_on_http_error(self, torrserver):
+        """Non-200 status raises TorrServerError."""
+        torrserver._session.request.return_value = _make_response({}, status_code=500)
+        with pytest.raises(TorrServerError):
+            torrserver.search("x")
