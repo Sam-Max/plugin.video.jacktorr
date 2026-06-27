@@ -315,3 +315,7 @@ msgstr "из"
 msgctxt "#30245"
 msgid "Torrent status"
 msgstr "Статус торрента"
+
+msgctxt "#30246"
+msgid "Download file"
+msgstr "Скачать файл"

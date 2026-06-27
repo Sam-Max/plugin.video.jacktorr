@@ -271,7 +271,9 @@ def file_action(info_hash, file_id, action_str):
     if action_str == "download":
         api.download_file(info_hash, file_id)
     elif action_str == "drop":
-        api.drop_torrent(info_hash, file_id)
+        # file_id is intentionally ignored: TorrServer drops whole torrents by
+        # hash, not individual files.
+        api.drop_torrent(info_hash)
     else:
         logging.error("Unknown action '%s'", action_str)
         return

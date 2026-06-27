@@ -244,3 +244,30 @@ class TestAddMagnetPoster:
         sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
         assert sent_data["action"] == "add"
         assert sent_data["poster"] == "http://example.com/p.jpg"
+
+
+class TestDownloadFile:
+    """Tests for TorrServer.download_file (GET /play/{hash}/{id})."""
+
+    def test_download_file_uses_play_path_endpoint(self, torrserver):
+        """download_file issues a GET to /play/{hash}/{id} with stream=True."""
+        torrserver._session.request.return_value = _make_response({"ok": True})
+        torrserver.download_file("abc", 2)
+        call = torrserver._session.request.call_args
+        assert call.args[0] == "get"
+        assert call.args[1] == "http://localhost:8090/play/abc/2"
+        assert call.kwargs["stream"] is True
+
+
+class TestDropTorrent:
+    """Regression guard for drop_torrent arity (1-arg, hash-only contract)."""
+
+    def test_drop_torrent_sends_drop_action_with_hash(self, torrserver):
+        """drop_torrent POSTs to /torrents with body {action: drop, hash: ...}."""
+        torrserver._session.request.return_value = _make_response({"ok": True})
+        torrserver.drop_torrent("abc")
+        call = torrserver._session.request.call_args
+        assert call.args[0] == "post"
+        assert call.args[1] == "http://localhost:8090/torrents"
+        sent_data = json.loads(call.kwargs["data"])
+        assert sent_data == {"action": "drop", "hash": "abc"}

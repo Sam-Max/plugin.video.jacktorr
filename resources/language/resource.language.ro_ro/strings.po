@@ -315,3 +315,7 @@ msgstr "din"
 msgctxt "#30245"
 msgid "Torrent status"
 msgstr "Stare torrent"
+
+msgctxt "#30246"
+msgid "Download file"
+msgstr "Descarcă fișier"

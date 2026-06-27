@@ -463,3 +463,7 @@ msgstr "de"
 msgctxt "#30245"
 msgid "Torrent status"
 msgstr "Status do torrent"
+
+msgctxt "#30246"
+msgid "Download file"
+msgstr "Descarregar ficheiro"

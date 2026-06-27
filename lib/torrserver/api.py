@@ -131,6 +131,10 @@ class TorrServer(object):
             data=dumps({"action": "rem", "hash": info_hash, "save_to_db": save_to_db}),
         )
 
+    def download_file(self, hash, file_id):
+        """stream a specific file's content from a torrent (GET /play/{hash}/{id})"""
+        return self._get("/play/{}/{}".format(hash, file_id), stream=True)
+
     def play_torrent(self, hash, id):
         """Play given torrent referenced by hash"""
         """ application/octet-stream """
