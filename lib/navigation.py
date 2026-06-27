@@ -195,6 +195,13 @@ def handle_player_stop(info_hash, name, initial_delay=0.5, listing_timeout=10):
 @plugin.route("/")
 @check_directory
 def index():
+    # Early TorrServer connectivity check: alert the user when the server is
+    # unreachable, but always render the menu so settings stay accessible.
+    # Broad except guarantees the directory never fails to open.
+    try:
+        api.torr_version
+    except Exception:
+        notification(translate(30247))
     addDirectoryItem(
         plugin.handle,
         plugin.url_for(torrents),
@@ -372,11 +379,11 @@ def display_text(info_hash, file_id, path):
 @check_playable
 def play_url(url, buffer=True, poster=""):
     try:
-        r = requests.get(url, stream=True, timeout=30)
-        r.raise_for_status()
+        with requests.get(url, stream=True, timeout=30) as r:
+            r.raise_for_status()
+            info_hash = api.add_torrent_obj(r.raw, poster=poster)
     except requests.RequestException as e:
         raise PlayError("Failed to download torrent: {}".format(e))
-    info_hash = api.add_torrent_obj(r.raw, poster=poster)
     play_info_hash(info_hash=info_hash, buffer=buffer)
 
 

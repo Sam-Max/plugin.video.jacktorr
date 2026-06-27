@@ -319,3 +319,7 @@ msgstr "Stare torrent"
 msgctxt "#30246"
 msgid "Download file"
 msgstr "Descarcă fișier"
+
+msgctxt "#30247"
+msgid "TorrServer unreachable — check settings"
+msgstr "TorrServer indisponibil — verificați setările"

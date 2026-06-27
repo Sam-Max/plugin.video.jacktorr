@@ -319,3 +319,7 @@ msgstr "Статус торрента"
 msgctxt "#30246"
 msgid "Download file"
 msgstr "Скачать файл"
+
+msgctxt "#30247"
+msgid "TorrServer unreachable — check settings"
+msgstr "TorrServer недоступен — проверьте настройки"
