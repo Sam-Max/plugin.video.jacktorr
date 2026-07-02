@@ -53,6 +53,7 @@ plugin = routing.Plugin()
 api = TorrServer(
     get_service_host(), get_port(), get_username(), get_password(), ssl_enabled()
 )
+logging.info("JackTorr api singleton created with base_url=%s", api._base_url)
 
 
 class PlayError(Exception):
@@ -306,13 +307,21 @@ def search():
     # is disabled or yields nothing, the endpoint returns [].
     query = Dialog().input(translate(30252))
     if not query:
+        logging.info("Search: user cancelled input dialog")
         return
     try:
         results = api.search(query)
     except TorrServerError as e:
+        logging.warning("Search: TorrServerError: %s", e)
         notification(str(e))
         return
+    logging.info(
+        "Search: query=%r returned %d results",
+        query,
+        len(results) if hasattr(results, "__len__") else -1,
+    )
     if not results:
+        logging.info("Search: no results, showing notification")
         notification(translate(30253))
         return
     for r in results:
@@ -324,6 +333,11 @@ def search():
         # Size is a human-readable string ("42.93 GB"), not bytes.
         label = "{} ({})".format(title, size) if size else title
         item = list_item(label, "download.png")
+        # Mark the item as playable so Kodi treats clicking it as a "resolve
+        # URL for playback" request rather than a directory listing. Without
+        # this, setResolvedUrl inside play() is a no-op and the stream never
+        # starts even though the preload/buffering dialog ran.
+        item.setProperty("IsPlayable", "true")
         # Context menu: Play — add the magnet and play directly (play_magnet
         # calls api.add_magnet then play_info_hash).
         context_menu_items = [

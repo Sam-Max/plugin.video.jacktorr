@@ -1,4 +1,5 @@
 from json import dumps
+import logging
 import requests
 from requests.auth import HTTPBasicAuth
 from urllib.parse import quote
@@ -93,15 +94,26 @@ class TorrServer(object):
         caller can show the localized 'enable Rutor' hint instead of a raw
         HTTP 400 message.
         """
+        logging.info("TorrServer search: query=%r base_url=%s", query, self._base_url)
         response = self._get("/search/", params={"query": query})
+        logging.info(
+            "TorrServer search: HTTP %d, body[:200]=%r",
+            response.status_code,
+            getattr(response, "text", "")[:200],
+        )
         if response.status_code not in (200, 400):
             raise TorrServerError(
                 "TorrServer /search returned HTTP {}".format(response.status_code)
             )
         try:
-            return response.json()
+            result = response.json()
         except ValueError:
             raise TorrServerError("TorrServer /search returned invalid JSON")
+        logging.info(
+            "TorrServer search: parsed %d results",
+            len(result) if isinstance(result, list) else -1,
+        )
+        return result
 
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""
