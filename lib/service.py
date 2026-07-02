@@ -98,7 +98,21 @@ class DaemonMonitor(xbmc.Monitor):
         )
         return True
 
+    def _refresh_connection(self):
+        """Re-read connection settings so the long-running monitor picks up
+        host/port/credential changes without requiring a Kodi restart."""
+        self._host = get_service_host()
+        self._port = get_port()
+        self._username = get_username()
+        self._password = get_password()
+        self._auth = HTTPBasicAuth(self._username, self._password)
+        self._ssl_enabled = ssl_enabled()
+        self._base_url = "{}://{}:{}".format(
+            "https" if self._ssl_enabled else "http", self._host, self._port
+        )
+
     def _update_daemon_settings(self):
+        self._refresh_connection()
         if not apply_settings_to_torrserver():
             return True
 
@@ -133,6 +147,11 @@ class DaemonMonitor(xbmc.Monitor):
             self.onSettingsChanged()
         except DaemonTimeoutError:
             logging.error("Timed out waiting for daemon")
+        # Keep the monitor alive so Kodi can deliver onSettingsChanged callbacks
+        # after runtime setting toggles. Without this loop the service thread ends
+        # immediately after the initial sync and no later setting change reaches
+        # the daemon.
+        self.waitForAbort()
 
 
 @kodi.once("migrated")

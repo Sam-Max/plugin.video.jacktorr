@@ -62,16 +62,19 @@ def _monitor():
 
 def test_update_daemon_settings_skips_remote_write_when_sync_disabled(monkeypatch):
     monitor = _monitor()
+    monitor._refresh_connection = MagicMock()
     monitor._get_daemon_settings = MagicMock()
 
     monkeypatch.setattr(service, "apply_settings_to_torrserver", lambda: False)
 
     assert monitor._update_daemon_settings() is True
+    monitor._refresh_connection.assert_called_once_with()
     monitor._get_daemon_settings.assert_not_called()
 
 
 def test_update_daemon_settings_writes_when_sync_enabled_and_settings_differ(monkeypatch):
     monitor = _monitor()
+    monitor._refresh_connection = MagicMock()
     monitor._get_daemon_settings = MagicMock(return_value={"CacheSize": 1})
     monitor._get_kodi_settings = MagicMock(return_value={"CacheSize": 2})
     monitor._request = MagicMock(return_value=MagicMock(status_code=200))
@@ -79,6 +82,7 @@ def test_update_daemon_settings_writes_when_sync_enabled_and_settings_differ(mon
     monkeypatch.setattr(service, "apply_settings_to_torrserver", lambda: True)
 
     assert monitor._update_daemon_settings() is True
+    monitor._refresh_connection.assert_called_once_with()
     monitor._request.assert_called_once_with(
         "post",
         "settings",
@@ -88,6 +92,7 @@ def test_update_daemon_settings_writes_when_sync_enabled_and_settings_differ(mon
 
 def test_update_daemon_settings_does_not_write_when_enabled_settings_match(monkeypatch):
     monitor = _monitor()
+    monitor._refresh_connection = MagicMock()
     settings = {"CacheSize": 2}
     monitor._get_daemon_settings = MagicMock(return_value=settings)
     monitor._get_kodi_settings = MagicMock(return_value=settings)
@@ -96,4 +101,53 @@ def test_update_daemon_settings_does_not_write_when_enabled_settings_match(monke
     monkeypatch.setattr(service, "apply_settings_to_torrserver", lambda: True)
 
     assert monitor._update_daemon_settings() is True
+    monitor._refresh_connection.assert_called_once_with()
     monitor._request.assert_not_called()
+
+
+def test_start_syncs_then_waits_for_abort():
+    monitor = _monitor()
+    monitor.onSettingsChanged = MagicMock()
+    monitor.waitForAbort = MagicMock()
+
+    monitor.start()
+
+    monitor.onSettingsChanged.assert_called_once_with()
+    monitor.waitForAbort.assert_called_once_with()
+
+
+def test_refresh_connection_reloads_settings(monkeypatch):
+    monitor = _monitor()
+
+    monkeypatch.setattr(service, "get_service_host", lambda: "new-host")
+    monkeypatch.setattr(service, "get_port", lambda: "9000")
+    monkeypatch.setattr(service, "get_username", lambda: "new-user")
+    monkeypatch.setattr(service, "get_password", lambda: "new-password")
+    monkeypatch.setattr(service, "ssl_enabled", lambda: True)
+
+    monitor._refresh_connection()
+
+    assert monitor._host == "new-host"
+    assert monitor._port == "9000"
+    assert monitor._username == "new-user"
+    assert monitor._password == "new-password"
+    assert monitor._base_url == "https://new-host:9000"
+    assert monitor._auth.username == "new-user"
+    assert monitor._auth.password == "new-password"
+
+
+def test_update_daemon_settings_refreshes_connection_before_gate(monkeypatch):
+    monitor = _monitor()
+    calls = []
+    monitor._refresh_connection = MagicMock(side_effect=lambda: calls.append("refresh"))
+    monitor._get_daemon_settings = MagicMock()
+
+    def sync_gate():
+        calls.append("gate")
+        return False
+
+    monkeypatch.setattr(service, "apply_settings_to_torrserver", sync_gate)
+
+    assert monitor._update_daemon_settings() is True
+    assert calls == ["refresh", "gate"]
+    monitor._get_daemon_settings.assert_not_called()
