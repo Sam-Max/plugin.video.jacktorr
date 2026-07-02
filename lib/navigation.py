@@ -196,9 +196,6 @@ def handle_player_stop(info_hash, name, initial_delay=0.5, listing_timeout=10):
 @plugin.route("/")
 @check_directory
 def index():
-    # Early TorrServer connectivity check: alert the user when the server is
-    # unreachable, but always render the menu so settings stay accessible.
-    # Broad except guarantees the directory never fails to open.
     try:
         api.torr_version
     except Exception:
@@ -302,13 +299,19 @@ def torrent_action(info_hash, action_str):
 @plugin.route("/search")
 @check_directory
 def search():
-    # TorrServer /search/?query=... returns a JSON list of Rutor results.
-    # Search must be enabled in TorrServer (EnableRutorSearch=true); when it
-    # is disabled or yields nothing, the endpoint returns [].
     query = Dialog().input(translate(30252))
     if not query:
         logging.info("Search: user cancelled input dialog")
         return
+    executebuiltin("Container.Update({})".format(
+        plugin.url_for(search_results, query=query)
+    ))
+
+
+@plugin.route("/search_results")
+@query_arg("query")
+@check_directory
+def search_results(query):
     try:
         results = api.search(query)
     except TorrServerError as e:
@@ -333,20 +336,11 @@ def search():
         # Size is a human-readable string ("42.93 GB"), not bytes.
         label = "{} ({})".format(title, size) if size else title
         item = list_item(label, "download.png")
-        # Mark the item as playable so Kodi treats clicking it as a "resolve
-        # URL for playback" request rather than a directory listing. Without
-        # this, setResolvedUrl inside play() is a no-op and the stream never
-        # starts even though the preload/buffering dialog ran.
         item.setProperty("IsPlayable", "true")
-        # Context menu: Play — add the magnet and play directly (play_magnet
-        # calls api.add_magnet then play_info_hash).
         context_menu_items = [
             (translate(30254), media(play_magnet, magnet=magnet, poster=""))
         ]
         item.addContextMenuItems(context_menu_items)
-        # Clicking the item triggers play_magnet (add + play directly), the
-        # user-chosen "Añadir y reproducir directo" flow. isFolder=False so
-        # Kodi treats it as a playable item, not a subdirectory.
         url = plugin.url_for(play_magnet, magnet=magnet, buffer=True, poster="")
         addDirectoryItem(plugin.handle, url, item, isFolder=False)
 
@@ -356,8 +350,6 @@ def file_action(info_hash, file_id, action_str):
     if action_str == "download":
         api.download_file(info_hash, file_id)
     elif action_str == "drop":
-        # file_id is intentionally ignored: TorrServer drops whole torrents by
-        # hash, not individual files.
         api.drop_torrent(info_hash)
     else:
         logging.error("Unknown action '%s'", action_str)
