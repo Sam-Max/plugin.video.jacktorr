@@ -303,7 +303,10 @@ def search():
     if not query:
         logging.info("Search: user cancelled input dialog")
         return
-    executebuiltin("Container.Update({})".format(
+    # 'replace' swaps the current container (/search) instead of pushing
+    # on top of it, so pressing Back from the results list returns to the
+    # main menu rather than re-running /search and re-prompting.
+    executebuiltin("Container.Update({}, replace)".format(
         plugin.url_for(search_results, query=query)
     ))
 
