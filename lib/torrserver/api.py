@@ -87,13 +87,21 @@ class TorrServer(object):
         Requires EnableRutorSearch=true in TorrServer settings. Returns the
         raw JSON list from TorrServer. Empty list when search is disabled or
         no results — do NOT use _parse_json_response (it raises on empty list).
+
+        TorrServer returns HTTP 400 with body [] when Rutor search is
+        disabled; treat that as an empty result rather than an error so the
+        caller can show the localized 'enable Rutor' hint instead of a raw
+        HTTP 400 message.
         """
         response = self._get("/search/", params={"query": query})
-        if response.status_code != 200:
+        if response.status_code not in (200, 400):
             raise TorrServerError(
                 "TorrServer /search returned HTTP {}".format(response.status_code)
             )
-        return response.json()
+        try:
+            return response.json()
+        except ValueError:
+            raise TorrServerError("TorrServer /search returned invalid JSON")
 
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""

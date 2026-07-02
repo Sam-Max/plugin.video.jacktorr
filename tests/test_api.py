@@ -311,8 +311,16 @@ class TestSearch:
         result = torrserver.search("nothing")
         assert result == []
 
+    def test_search_400_disabled_returns_empty_list(self, torrserver):
+        """TorrServer returns HTTP 400 + [] when Rutor search is disabled —
+        treat as an empty result so the caller can show the localized hint
+        instead of a raw 'HTTP 400' error."""
+        torrserver._session.request.return_value = _make_response([], status_code=400)
+        result = torrserver.search("x")
+        assert result == []
+
     def test_search_raises_on_http_error(self, torrserver):
-        """Non-200 status raises TorrServerError."""
+        """Non-200/400 status raises TorrServerError."""
         torrserver._session.request.return_value = _make_response({}, status_code=500)
         with pytest.raises(TorrServerError):
             torrserver.search("x")
