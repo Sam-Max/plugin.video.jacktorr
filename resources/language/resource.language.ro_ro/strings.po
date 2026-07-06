@@ -359,3 +359,7 @@ msgstr "Caută"
 msgctxt "#30256"
 msgid "New search"
 msgstr "New search"
+
+msgctxt "#30257"
+msgid "Clear history"
+msgstr "Clear history"

@@ -31,6 +31,7 @@ from lib.kodi_formats import (
     strip_common_folder_prefix,
 )
 from lib.player import JackTorrPlayer
+from lib.search_history import load_history, add_search, clear_history
 from lib.settings import (
     get_password,
     get_service_host,
@@ -303,11 +304,23 @@ def new_search():
         logging.info("Search: user cancelled input dialog")
         endOfDirectory(plugin.handle, succeeded=False)
         return
+    # Record the term so it appears in the history next time.
+    add_search(query)
     executebuiltin(
         "Container.Update({}, replace)".format(
             plugin.url_for(search_results, query=query)
         )
     )
+
+
+@plugin.route("/clear_search_history")
+def clear_search_history():
+    from lib.search_history import clear_history as _clear
+
+    _clear()
+    logging.info("Search: history cleared")
+    executebuiltin("Container.Refresh")
+    endOfDirectory(plugin.handle, succeeded=True)
 
 
 @plugin.route("/search_results")
@@ -321,6 +334,21 @@ def search_results(query=None):
         addDirectoryItem(
             plugin.handle,
             plugin.url_for(new_search),
+            item,
+            isFolder=False,
+        )
+        for term in load_history():
+            addDirectoryItem(
+                plugin.handle,
+                plugin.url_for(search_results, query=term),
+                list_item(term, "download.png"),
+                isFolder=True,
+            )
+        item = li(30257, "download.png")
+        item.setProperty("IsPlayable", "false")
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(clear_search_history),
             item,
             isFolder=False,
         )
