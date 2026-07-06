@@ -363,3 +363,7 @@ msgstr "New search"
 msgctxt "#30257"
 msgid "Clear history"
 msgstr "Clear history"
+
+msgctxt "#30258"
+msgid "Buffering retries"
+msgstr "Buffering retries"

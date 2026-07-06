@@ -78,7 +78,8 @@ class TorrServer(object):
         response = self._post("/torrents", data=dumps({"action": "list"}))
         if response.status_code != 200:
             raise TorrServerError(
-                "TorrServer /torrents returned HTTP {}".format(response.status_code)
+                "TorrServer /torrents returned HTTP {}".format(response.status_code),
+                status_code=response.status_code,
             )
         return response.json()
 
@@ -103,12 +104,16 @@ class TorrServer(object):
         )
         if response.status_code not in (200, 400):
             raise TorrServerError(
-                "TorrServer /search returned HTTP {}".format(response.status_code)
+                "TorrServer /search returned HTTP {}".format(response.status_code),
+                status_code=response.status_code,
             )
         try:
             result = response.json()
         except ValueError:
-            raise TorrServerError("TorrServer /search returned invalid JSON")
+            raise TorrServerError(
+                "TorrServer /search returned invalid JSON",
+                status_code=response.status_code,
+            )
         logging.info(
             "TorrServer search: parsed %d results",
             len(result) if isinstance(result, list) else -1,
@@ -214,7 +219,8 @@ class TorrServer(object):
                     endpoint,
                     status_code,
                     ": {}".format(snippet) if snippet else "",
-                )
+                ),
+                status_code=status_code,
             )
 
         try:
@@ -224,7 +230,8 @@ class TorrServer(object):
                 "TorrServer {} returned invalid JSON{}".format(
                     endpoint,
                     ": {}".format(snippet) if snippet else "",
-                )
+                ),
+                status_code=status_code,
             )
 
         # Some TorrServer versions return a list instead of a dict.
@@ -233,7 +240,8 @@ class TorrServer(object):
         if isinstance(result, list):
             if not result:
                 raise TorrServerError(
-                    "TorrServer {} returned empty list".format(endpoint)
+                    "TorrServer {} returned empty list".format(endpoint),
+                    status_code=status_code,
                 )
             result = result[0]
 
@@ -261,4 +269,6 @@ class TorrServer(object):
 
 
 class TorrServerError(Exception):
-    pass
+    def __init__(self, message, status_code=None):
+        super(TorrServerError, self).__init__(message)
+        self.status_code = status_code

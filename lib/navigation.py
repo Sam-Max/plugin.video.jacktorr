@@ -10,6 +10,15 @@ from xbmc import Monitor, executebuiltin, getInfoLabel, getCondVisibility, sleep
 from xbmcgui import ListItem, DialogProgress, Dialog
 from xbmcplugin import addDirectoryItem, endOfDirectory, setResolvedUrl
 
+from lib.buffering import (
+    MAX_RETRIES_DEFAULT,
+    clamp_progress,
+    is_retryable_error,
+    backoff_seconds,
+    compute_buffering_progress,
+    is_preload_complete,
+    is_resolving_metadata,
+)
 from lib.dialog import DialogInsert
 from lib.kodi import (
     ADDON_PATH,
@@ -37,6 +46,7 @@ from lib.settings import (
     get_service_host,
     get_port,
     get_buffering_timeout,
+    get_buffer_retries,
     get_username,
     show_status_overlay,
     get_min_candidate_size,
@@ -628,63 +638,121 @@ def preload_torrent(info_hash, file_id):
 
 def wait_for_buffering_completion(info_hash, file_id):
     close_busy_dialog()
-    try:
-        info = api.get_torrent_file_info(info_hash, file_id)
-    except TorrServerError as e:
-        notification(str(e))
-        raise PlayError(str(e))
+    monitor = Monitor()
+    initial_retry_count = 0
+    while True:
+        try:
+            info = api.get_torrent_file_info(info_hash, file_id)
+            break
+        except TorrServerError as e:
+            retryable = is_retryable_error(e)
+            if retryable and initial_retry_count < MAX_RETRIES_DEFAULT:
+                initial_retry_count += 1
+                backoff = backoff_seconds(initial_retry_count - 1)
+                logging.warning(
+                    "Initial buffering info error (retry %d/%d): %s, backing off %.1fs",
+                    initial_retry_count,
+                    MAX_RETRIES_DEFAULT,
+                    e,
+                    backoff,
+                )
+                if monitor.waitForAbort(backoff):
+                    api.drop_torrent(info_hash)
+                    raise PlayError("Abort requested")
+                continue
+            if retryable:
+                logging.error(
+                    "Initial buffering info error exhausted after %d retries: %s",
+                    MAX_RETRIES_DEFAULT,
+                    e,
+                )
+            notification(str(e))
+            api.drop_torrent(info_hash)
+            raise PlayError(str(e))
 
     of = translate(30244)
     timeout = get_buffering_timeout()
+    retries = get_buffer_retries()
+    retry_count = 0
     start_time = time.time()
 
-    monitor = Monitor()
     progress = DialogProgress()
     progress.create(ADDON_NAME)
 
     try:
+        name = info.get("name", "")
         while True:
             current_time = time.time()
             try:
                 status = api.get_torrent_file_info(info_hash, file_id)
             except TorrServerError as e:
+                retryable = is_retryable_error(e)
+                if retryable and retry_count < retries:
+                    retry_count += 1
+                    backoff = backoff_seconds(retry_count - 1)
+                    logging.warning(
+                        "Buffering polling error (retry %d/%d): %s, backing off %.1fs",
+                        retry_count,
+                        retries,
+                        e,
+                        backoff,
+                    )
+                    progress.update(
+                        0,
+                        "Retrying {}/{}...\n{}\n{}".format(
+                            retry_count,
+                            retries,
+                            e,
+                            name,
+                        ),
+                    )
+                    if monitor.waitForAbort(backoff):
+                        api.drop_torrent(info_hash)
+                        raise PlayError("Abort requested")
+                    continue
+                if retryable:
+                    logging.error(
+                        "Buffering polling error exhausted after %d retries: %s",
+                        retries,
+                        e,
+                    )
                 notification(str(e))
                 api.drop_torrent(info_hash)
                 raise PlayError(str(e))
+
+            retry_count = 0
 
             preloaded_bytes = status.get("preloaded_bytes", 0)
             preload_size = status.get("preload_size", 0)
             seeds = status.get("connected_seeders", 0)
             peers = status.get("active_peers", 0)
             total_peers = status.get("total_peers", 0)
+            speed = status.get("download_speed", 0)
+            name = status.get("name") or name
 
-            if preloaded_bytes != 0 and preload_size != 0:
-                if preloaded_bytes >= preload_size:
-                    break
+            if is_preload_complete(preloaded_bytes, preload_size):
+                break
 
-            if preload_size != 0:
-                buffering_progress = preloaded_bytes * 100 / preload_size
-            else:
+            buffering_progress = clamp_progress(
+                compute_buffering_progress(preloaded_bytes, preload_size)
+            )
+            dialog_text = "{} - {:.2f}%\n{} {} {} - {}/s S:{} P:{}/{}\n{}\n".format(
+                get_state_string(status.get("stat")),
+                buffering_progress,
+                sizeof_fmt(preloaded_bytes),
+                of,
+                sizeof_fmt(preload_size),
+                sizeof_fmt(speed),
+                seeds,
+                peers,
+                total_peers,
+                name,
+            )
+            if is_resolving_metadata(preload_size):
+                dialog_text = "Resolving metadata...\n" + dialog_text
                 buffering_progress = 0
 
-            speed = status.get("download_speed", 0)
-            name = info.get("name")
-
-            progress.update(
-                int(buffering_progress),
-                "{} - {:.2f}%\n{} {} {} - {}/s S:{} P:{}/{}\n{}\n".format(
-                    get_state_string(status.get("stat")),
-                    buffering_progress,
-                    sizeof_fmt(preloaded_bytes),
-                    of,
-                    sizeof_fmt(preload_size),
-                    sizeof_fmt(speed),
-                    seeds,
-                    peers,
-                    total_peers,
-                    name,
-                ),
-            )
+            progress.update(buffering_progress, dialog_text)
 
             if progress.iscanceled():
                 api.drop_torrent(info_hash)

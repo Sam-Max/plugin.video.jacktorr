@@ -65,8 +65,9 @@ class TestParseJsonResponse:
     def test_non_200_status_raises_error(self, torrserver):
         """HTTP 500 raises TorrServerError with endpoint info."""
         response = _make_response({"error": "internal"}, status_code=500)
-        with pytest.raises(TorrServerError, match="/torrent/upload.*HTTP 500"):
+        with pytest.raises(TorrServerError, match="/torrent/upload.*HTTP 500") as exc:
             torrserver._parse_json_response(response, "/torrent/upload")
+        assert exc.value.status_code == 500
 
     def test_invalid_json_raises_error(self, torrserver):
         """Invalid JSON raises TorrServerError."""
@@ -74,8 +75,21 @@ class TestParseJsonResponse:
         response.status_code = 200
         response.text = "not json"
         response.json.side_effect = ValueError("invalid json")
-        with pytest.raises(TorrServerError, match="invalid JSON"):
+        with pytest.raises(TorrServerError, match="invalid JSON") as exc:
             torrserver._parse_json_response(response, "/torrent/upload")
+        assert exc.value.status_code == 200
+
+
+class TestTorrServerError:
+    def test_legacy_constructor_defaults_status_code_to_none(self):
+        error = TorrServerError("legacy")
+        assert str(error) == "legacy"
+        assert error.status_code is None
+
+    def test_constructor_keeps_explicit_status_code(self):
+        error = TorrServerError("unavailable", status_code=503)
+        assert str(error) == "unavailable"
+        assert error.status_code == 503
 
 
 class TestAddMagnet:
@@ -322,5 +336,6 @@ class TestSearch:
     def test_search_raises_on_http_error(self, torrserver):
         """Non-200/400 status raises TorrServerError."""
         torrserver._session.request.return_value = _make_response({}, status_code=500)
-        with pytest.raises(TorrServerError):
+        with pytest.raises(TorrServerError) as exc:
             torrserver.search("x")
+        assert exc.value.status_code == 500

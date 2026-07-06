@@ -22,6 +22,10 @@ def get_buffering_timeout():
     return get_int_setting("buffer_timeout")
 
 
+def get_buffer_retries():
+    return get_int_setting("buffer_retries")
+
+
 def show_status_overlay():
     return get_boolean_setting("overlay")
 
