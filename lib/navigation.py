@@ -312,9 +312,18 @@ def search():
 
 
 @plugin.route("/search_results")
-@query_arg("query")
+@query_arg("query", required=False)
 @check_directory
-def search_results(query):
+def search_results(query=None):
+    # Kodi may restore /search_results as the last-opened container on addon
+    # restart without preserving the ?query= part, so the route is reached
+    # with no query. Re-prompt instead of crashing with AttributeError.
+    if not query:
+        logging.info("Search: /search_results reached with no query, prompting")
+        executebuiltin("Container.Update({}, replace)".format(
+            plugin.url_for(search)
+        ))
+        return
     try:
         results = api.search(query)
     except TorrServerError as e:
