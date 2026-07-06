@@ -214,7 +214,7 @@ def index():
     )
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(search),
+        plugin.url_for(search_results),
         li(30255, "download.png"),
         isFolder=True,
     )
@@ -296,33 +296,34 @@ def torrent_action(info_hash, action_str):
         refresh()
 
 
-@plugin.route("/search")
-@check_directory
-def search():
+@plugin.route("/new_search")
+def new_search():
     query = Dialog().input(translate(30252))
     if not query:
         logging.info("Search: user cancelled input dialog")
+        endOfDirectory(plugin.handle, succeeded=False)
         return
-    # 'replace' swaps the current container (/search) instead of pushing
-    # on top of it, so pressing Back from the results list returns to the
-    # main menu rather than re-running /search and re-prompting.
-    executebuiltin("Container.Update({}, replace)".format(
-        plugin.url_for(search_results, query=query)
-    ))
+    executebuiltin(
+        "Container.Update({}, replace)".format(
+            plugin.url_for(search_results, query=query)
+        )
+    )
 
 
 @plugin.route("/search_results")
 @query_arg("query", required=False)
 @check_directory
 def search_results(query=None):
-    # Kodi may restore /search_results as the last-opened container on addon
-    # restart without preserving the ?query= part, so the route is reached
-    # with no query. Re-prompt instead of crashing with AttributeError.
     if not query:
-        logging.info("Search: /search_results reached with no query, prompting")
-        executebuiltin("Container.Update({}, replace)".format(
-            plugin.url_for(search)
-        ))
+        logging.info("Search: /search_results reached with no query")
+        item = li(30256, "download.png")
+        item.setProperty("IsPlayable", "false")
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(new_search),
+            item,
+            isFolder=False,
+        )
         return
     try:
         results = api.search(query)

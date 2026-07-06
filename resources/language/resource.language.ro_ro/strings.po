@@ -355,3 +355,7 @@ msgstr "Redă"
 msgctxt "#30255"
 msgid "Search"
 msgstr "Caută"
+
+msgctxt "#30256"
+msgid "New search"
+msgstr "New search"

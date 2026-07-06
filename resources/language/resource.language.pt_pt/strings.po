@@ -503,3 +503,7 @@ msgstr "Reproduzir"
 msgctxt "#30255"
 msgid "Search"
 msgstr "Pesquisar"
+
+msgctxt "#30256"
+msgid "New search"
+msgstr "New search"
