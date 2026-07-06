@@ -14,24 +14,24 @@
 
 </div>
 
-## 🌟 Overview
+## Overview
 
 **JackTorr** is a high-performance torrent streaming addon for Kodi. It leverages the power of [TorrServer](https://github.com/YouROK/TorrServer) to provide a seamless streaming experience, featuring on-the-fly metadata retrieval, intelligent buffering, and comprehensive playback controls.
 
 ---
 
-## ✨ Features
+## Features
 
-- **🚀 High-Speed Streaming**: Optimized for TorrServer's HTTP API for efficient torrent streaming.
-- **📦 Versatile Input**: Support for Magnet links, local `.torrent` files, and direct torrent URLs.
-- **📊 Real-time Status**: Optional status overlay showing download speed, active peers, and buffering progress.
-- **⚙️ Advanced Buffering**: Configurable pre-load cache and buffering timeouts.
-- **📂 Smart File Selection**: Automatically identifies video candidates or lets you choose from multiple files.
-- **🔌 API for Addons**: Simple plugin API allows other Kodi addons to trigger JackTorr playback.
+- **High-Speed Streaming**: Optimized for TorrServer's HTTP API for efficient torrent streaming.
+- **Versatile Input**: Support for Magnet links, local `.torrent` files, and direct torrent URLs.
+- **Real-time Status**: Optional status overlay showing download speed, active peers, and buffering progress.
+- **Advanced Buffering**: Configurable pre-load cache and buffering timeouts.
+- **Smart File Selection**: Automatically identifies video candidates or lets you choose from multiple files.
+- **API for Addons**: Simple plugin API allows other Kodi addons to trigger JackTorr playback.
 
 ---
 
-## 📥 Installation
+## Installation
 
 1.  **Direct Download**: Get the [latest release](https://github.com/Sam-Max/plugin.video.jacktorr/releases/latest).
 2.  **Kodi Install**:
@@ -43,7 +43,7 @@
 
 ---
 
-## 🚀 Server Setup
+## Server Setup
 
 JackTorr requires an external TorrServer instance to function. You can set this up in several ways:
 
@@ -78,7 +78,7 @@ services:
 
 ---
 
-## 🛠️ API Guide
+## API Guide
 
 Developers can integrate JackTorr into their own addons using the following protocol:
 
@@ -90,7 +90,7 @@ Developers can integrate JackTorr into their own addons using the following prot
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 | Player Interface |
 | :---: |
