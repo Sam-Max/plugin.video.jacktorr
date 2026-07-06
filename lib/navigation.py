@@ -203,10 +203,10 @@ def index():
         notification(translate(30247))
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(torrents),
-        li(30206, "torrents.png"),
+        plugin.url_for(search_results),
+        li(30255, "download.png"),
         isFolder=True,
-    )
+    )    
     addDirectoryItem(
         plugin.handle,
         plugin.url_for(dialog_insert),
@@ -215,12 +215,11 @@ def index():
     )
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(search_results),
-        li(30255, "download.png"),
+        plugin.url_for(torrents),
+        li(30206, "torrents.png"),
         isFolder=True,
     )
-
-
+    
 @plugin.route("/torrents")
 @check_directory
 def torrents():
