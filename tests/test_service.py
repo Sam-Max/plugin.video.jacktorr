@@ -1,7 +1,11 @@
 import json
+import logging
 import sys
+import threading
 import types
 from unittest.mock import MagicMock
+
+from requests.exceptions import ConnectionError
 
 
 class _Addon:
@@ -70,6 +74,30 @@ def test_update_daemon_settings_skips_remote_write_when_sync_disabled(monkeypatc
     assert monitor._update_daemon_settings() is True
     monitor._refresh_connection.assert_called_once_with()
     monitor._get_daemon_settings.assert_not_called()
+
+
+def test_get_daemon_settings_handles_unavailable_torrserver(caplog):
+    monitor = _monitor()
+    monitor._base_url = "http://192.168.50.26:5665"
+    monitor._request = MagicMock(side_effect=ConnectionError("Connection refused"))
+
+    with caplog.at_level(logging.ERROR):
+        assert monitor._get_daemon_settings() is None
+
+    assert "TorrServer is unavailable at http://192.168.50.26:5665" in caplog.text
+
+
+def test_settings_callback_retries_after_unavailable_daemon(monkeypatch):
+    monitor = _monitor()
+    monitor._lock = threading.Lock()
+    monitor._enabled = None
+    monitor._update_daemon_settings = MagicMock(return_value=False)
+    monkeypatch.setattr(service, "service_enabled", lambda: True)
+
+    monitor.onSettingsChanged()
+    monitor.onSettingsChanged()
+
+    assert monitor._update_daemon_settings.call_count == 2
 
 
 def test_update_daemon_settings_writes_when_sync_enabled_and_settings_differ(monkeypatch):

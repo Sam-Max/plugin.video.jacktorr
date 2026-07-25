@@ -4,6 +4,7 @@ import os
 import threading
 from requests import request
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import RequestException
 from lib.utils import assure_unicode, megabytes_to_bytes
 import xbmc
 import xbmcgui
@@ -77,9 +78,17 @@ class DaemonMonitor(xbmc.Monitor):
         return s
 
     def _get_daemon_settings(self):
-        r = self._request(
-            "post", self._settings_get_uri, data=json.dumps({"action": "get"})
-        )
+        try:
+            r = self._request(
+                "post", self._settings_get_uri, data=json.dumps({"action": "get"})
+            )
+        except RequestException as error:
+            logging.error(
+                "TorrServer is unavailable at %s; settings will sync on the next change: %s",
+                self._base_url,
+                error,
+            )
+            return None
         if r.status_code != 200:
             logging.error(
                 "Failed getting daemon settings with code %d: %s", r.status_code, r.text
