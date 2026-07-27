@@ -20,6 +20,7 @@ from lib.buffering import (
     is_resolving_metadata,
 )
 from lib.dialog import DialogInsert
+from lib.episode_matching import match_episode_file
 from lib.kodi import (
     ADDON_PATH,
     ADDON_NAME,
@@ -496,24 +497,38 @@ def display_text(info_hash, file_id, path):
 @plugin.route("/play_url")
 @query_arg("url")
 @query_arg("poster", required=False)
+@query_arg("season", required=False)
+@query_arg("episode", required=False)
 @check_playable
-def play_url(url, buffer=True, poster=""):
+def play_url(url, buffer=True, poster="", season="", episode=""):
     try:
         with requests.get(url, stream=True, timeout=30) as r:
             r.raise_for_status()
             info_hash = api.add_torrent_obj(r.raw, poster=poster)
     except requests.RequestException as e:
         raise PlayError("Failed to download torrent: {}".format(e))
-    play_info_hash(info_hash=info_hash, buffer=buffer)
+    play_info_hash(
+        info_hash=info_hash,
+        buffer=buffer,
+        season=season,
+        episode=episode,
+    )
 
 
 @plugin.route("/play_magnet")
 @query_arg("magnet")
 @query_arg("poster", required=False)
+@query_arg("season", required=False)
+@query_arg("episode", required=False)
 @check_playable
-def play_magnet(magnet, buffer=True, poster=""):
+def play_magnet(magnet, buffer=True, poster="", season="", episode=""):
     info_hash = api.add_magnet(magnet, poster=poster)
-    play_info_hash(info_hash=info_hash, buffer=buffer)
+    play_info_hash(
+        info_hash=info_hash,
+        buffer=buffer,
+        season=season,
+        episode=episode,
+    )
 
 
 @plugin.route("/play_path")
@@ -527,8 +542,10 @@ def play_file(path, buffer=True, poster=""):
 
 @plugin.route("/play_info_hash")
 @query_arg("info_hash")
+@query_arg("season", required=False)
+@query_arg("episode", required=False)
 @check_playable
-def play_info_hash(info_hash, buffer=True):
+def play_info_hash(info_hash, buffer=True, season="", episode=""):
     try:
         info = api.get_torrent_info(info_hash)
     except TorrServerError as e:
@@ -551,14 +568,24 @@ def play_info_hash(info_hash, buffer=True):
     elif len(candidate_files) == 1:
         chosen_file = candidate_files[0]
     else:
-        sort_files(candidate_files)
-        display_names = strip_common_folder_prefix(candidate_files)
-        chosen_index = Dialog().select(
-            translate(30240), display_names
+        torrent_title = " ".join(
+            str(info.get(key) or "") for key in ("title", "name")
         )
-        if chosen_index < 0:
-            raise PlayError("User canceled dialog select")
-        chosen_file = candidate_files[chosen_index]
+        chosen_file = match_episode_file(
+            candidate_files,
+            season=season,
+            episode=episode,
+            torrent_title=torrent_title,
+        )
+        if chosen_file is None:
+            sort_files(candidate_files)
+            display_names = strip_common_folder_prefix(candidate_files)
+            chosen_index = Dialog().select(
+                translate(30240), display_names
+            )
+            if chosen_index < 0:
+                raise PlayError("User canceled dialog select")
+            chosen_file = candidate_files[chosen_index]
 
     if buffer:
         buffer_and_play(
