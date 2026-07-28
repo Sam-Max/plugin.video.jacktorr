@@ -1,47 +1,52 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <category label="$INFO[System.AddonTitle(Window.Property(Addon.ID))]">
+    <category label="30086">
         <setting id="service_enabled" type="bool" label="30059" default="true"/>
         <setting id="service_host" type="text" label="30060" default="127.0.0.1"/>
         <setting id="service_port" type="number" label="30001" default="5665"/>
         <setting id="ssl_connection" type="bool" label="30031" default="false"/>
-		<setting id="service_login" label="30005" type="text" default="" />
-		<setting id="service_password" label="30006" type="text" option="hidden" default="" />
-        <setting id="apply_settings_to_torrserver" type="bool" label="30085" default="false"/>
+        <setting id="service_login" label="30005" type="text" default="" />
+        <setting id="service_password" label="30006" type="text" option="hidden" default="" />
+    </category>
+    <category label="30087">
         <setting id="files_order" type="enum" label="30064" default="0" lvalues="30065|30066|30067"/>
         <setting id="overlay" type="bool" label="30004" default="true"/>
+        <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
+        <setting id="ask_to_delete" type="bool" label="30056" default="true"/>
+    </category>
+    <category label="30088">
         <setting id="metadata_timeout" type="slider" label="30081" option="int" range="0,10,120" default="30"/>
         <setting id="buffer_timeout" type="slider" label="30003" option="int" range="0,30,600" default="60"/>
         <setting id="buffer_retries" type="number" label="30258" default="3"/>
-        <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
-        <setting id="ask_to_delete" type="bool" label="30056" default="true"/>
-        <setting id="migrated" type="bool" visible="false" default="false"/>
     </category>
-    <!--General -->
-    <category label="Settings">
-		<setting id="s:CacheSize" label="30012" type="number" default="25" />
-		<setting id="s:ReaderReadAHead" label="30013" type="number" default="95" />
-		<setting id="s:PreloadCache" label="30014" type="number" default="50" />
-		<setting id="s:EnableIPv6" label="30018" type="bool" default="False" />
-		<setting id="s:DisableTCP" label="30043" type="bool" default="False" />
-		<setting id="s:DisableUTP" label="30044" type="bool" default="False" />
-		<setting id="s:DisablePEX" label="30045" type="bool" default="False" />
-		<setting id="s:DisableUPNP" label="30017" type="bool" default="False" />
-		<setting id="s:DisableDHT" label="30016" type="bool" default="False" />
-		<setting id="s:DisableUpload" label="30046" type="bool" default="False" />
-		<setting id="s:ForceEncrypt" label="30039" type="bool" default="False"/>
-		<setting id="s:RetrackersMode" label="30047" type="enum" lvalues="30032|30033|30040|30041" default="1" />
-		<setting id="s:DownloadRateLimit" label="30034" type="number" default="0" />
-		<setting id="s:UploadRateLimit" label="30035" type="number" default="0" />
-		<setting id="s:ConnectionsLimit" label="30011" type="number" default="40" />
-		<setting id="s:PeersListenPort" label="30036" type="number" default="0" />
-		<setting id="s:DhtConnectionLimit" label="30037" type="number" default="500" />
-		<setting id="s:TorrentDisconnectTimeout" label="30038" type="number" default="14" />
-		<setting id="s:UseDisk" label="30048" type="bool" default="False" />
-		<setting id="s:TorrentsSavePath" type="text" label="30010" default="/opt/ts/torrents" enable="eq(-1,true)" />
-		<setting id="s:RemoveCacheOnDrop" label="30049" type="bool" default="False" enable="eq(-2,true)" />
-		<setting id="s:EnableDebug" label="30050" type="bool" default="false" />
-		<setting id="s:EnableDLNA" label="30071" type="bool" default="false" />
-		<setting id="s:EnableRutorSearch" label="30072" type="bool" default="false" />
+    <category label="30089">
+        <setting id="migrated" type="bool" visible="false" default="false"/>
+        <setting id="apply_settings_to_torrserver" type="bool" label="30085" default="false"/>
+    </category>
+    <category label="30090">
+        <setting id="s:CacheSize" label="30012" type="number" default="25" visible="eq(-1,true)" enable="eq(-1,true)" />
+        <setting id="s:ReaderReadAHead" label="30013" type="number" default="95" visible="eq(-2,true)" enable="eq(-2,true)" />
+        <setting id="s:PreloadCache" label="30014" type="number" default="50" visible="eq(-3,true)" enable="eq(-3,true)" />
+        <setting id="s:EnableIPv6" label="30018" type="bool" default="False" visible="eq(-4,true)" enable="eq(-4,true)" />
+        <setting id="s:DisableTCP" label="30043" type="bool" default="False" visible="eq(-5,true)" enable="eq(-5,true)" />
+        <setting id="s:DisableUTP" label="30044" type="bool" default="False" visible="eq(-6,true)" enable="eq(-6,true)" />
+        <setting id="s:DisablePEX" label="30045" type="bool" default="False" visible="eq(-7,true)" enable="eq(-7,true)" />
+        <setting id="s:DisableUPNP" label="30017" type="bool" default="False" visible="eq(-8,true)" enable="eq(-8,true)" />
+        <setting id="s:DisableDHT" label="30016" type="bool" default="False" visible="eq(-9,true)" enable="eq(-9,true)" />
+        <setting id="s:DisableUpload" label="30046" type="bool" default="False" visible="eq(-10,true)" enable="eq(-10,true)" />
+        <setting id="s:ForceEncrypt" label="30039" type="bool" default="False" visible="eq(-11,true)" enable="eq(-11,true)" />
+        <setting id="s:RetrackersMode" label="30047" type="enum" lvalues="30032|30033|30040|30041" default="1" visible="eq(-12,true)" enable="eq(-12,true)" />
+        <setting id="s:DownloadRateLimit" label="30034" type="number" default="0" visible="eq(-13,true)" enable="eq(-13,true)" />
+        <setting id="s:UploadRateLimit" label="30035" type="number" default="0" visible="eq(-14,true)" enable="eq(-14,true)" />
+        <setting id="s:ConnectionsLimit" label="30011" type="number" default="40" visible="eq(-15,true)" enable="eq(-15,true)" />
+        <setting id="s:PeersListenPort" label="30036" type="number" default="0" visible="eq(-16,true)" enable="eq(-16,true)" />
+        <setting id="s:DhtConnectionLimit" label="30037" type="number" default="500" visible="eq(-17,true)" enable="eq(-17,true)" />
+        <setting id="s:TorrentDisconnectTimeout" label="30038" type="number" default="14" visible="eq(-18,true)" enable="eq(-18,true)" />
+        <setting id="s:UseDisk" label="30048" type="bool" default="False" visible="eq(-19,true)" enable="eq(-19,true)" />
+        <setting id="s:TorrentsSavePath" type="text" label="30010" default="/opt/ts/torrents" enable="eq(-1,true)+eq(-20,true)" visible="eq(-20,true)" />
+        <setting id="s:RemoveCacheOnDrop" label="30049" type="bool" default="False" enable="eq(-2,true)+eq(-21,true)" visible="eq(-21,true)" />
+        <setting id="s:EnableDebug" label="30050" type="bool" default="false" visible="eq(-22,true)" enable="eq(-22,true)" />
+        <setting id="s:EnableDLNA" label="30071" type="bool" default="false" visible="eq(-23,true)" enable="eq(-23,true)" />
+        <setting id="s:EnableRutorSearch" label="30072" type="bool" default="false" visible="eq(-24,true)" enable="eq(-24,true)" />
     </category>
 </settings>

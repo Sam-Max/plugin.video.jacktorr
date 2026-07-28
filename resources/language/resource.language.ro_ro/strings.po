@@ -214,6 +214,26 @@ msgctxt "#30085"
 msgid "Apply settings to TorrServer"
 msgstr "Aplică setările în TorrServer"
 
+msgctxt "#30086"
+msgid "Connection"
+msgstr "Conexiune"
+
+msgctxt "#30087"
+msgid "Playback"
+msgstr "Redare"
+
+msgctxt "#30088"
+msgid "Buffering"
+msgstr "Buffering"
+
+msgctxt "#30089"
+msgid "Sync"
+msgstr "Sincr."
+
+msgctxt "#30090"
+msgid "Advanced"
+msgstr "Avansat"
+
 # Service
 msgctxt "#30100"
 msgid "JackTorr - First run"
