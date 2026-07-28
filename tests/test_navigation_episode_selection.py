@@ -206,3 +206,21 @@ def test_play_info_hash_opens_dialog_when_episode_match_is_ambiguous(monkeypatch
 
     dialog.select.assert_called_once()
     play.assert_called_once_with(info_hash="hash", file_id=2, path="release-b.1x05.mkv")
+
+
+def test_torrent_files_uses_original_path_for_stream_url(monkeypatch):
+    path = "Show/Season 1/ep01.mkv"
+    monkeypatch.setattr(
+        navigation.api,
+        "get_torrent_info",
+        lambda **_kwargs: {"file_stats": [{"id": 7, "path": path}], "title": "Show"},
+    )
+    stream_url = MagicMock(return_value="http://stream")
+    monkeypatch.setattr(navigation.api, "get_stream_url", stream_url)
+    monkeypatch.setattr(navigation, "hide_subfolder_components", lambda: True)
+    monkeypatch.setattr(navigation, "list_item", lambda *_args, **_kwargs: MagicMock())
+    monkeypatch.setattr(navigation, "addDirectoryItem", lambda *_args, **_kwargs: None)
+
+    navigation.torrent_files("hash")
+
+    stream_url.assert_called_once_with(link="hash", path=path, file_id=7)

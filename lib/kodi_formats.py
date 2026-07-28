@@ -81,7 +81,7 @@ def is_displayable(name):
     return is_video(name) or is_music(name) or is_picture(name) or is_text(name)
 
 
-def strip_common_folder_prefix(file_stats):
+def strip_common_folder_prefix(file_stats, hide_subfolder_components=False):
     """Return display names with the common leading folder prefix removed.
 
     For TV shows and torrents where every file lives under the same root
@@ -89,14 +89,18 @@ def strip_common_folder_prefix(file_stats):
     visually noisy. This strips the shared folder prefix so the listing
     shows just the distinguishing part ('Season.1/ep01.mkv' or 'ep01.mkv').
 
-    The original path is still used for stream URLs and API calls; only the
-    ListItem label changes.
+    When hide_subfolder_components is enabled, labels use only their basename.
+    Duplicate basenames are intentionally preserved because the original paths
+    are still used for stream URLs and API calls; only the ListItem label changes.
     """
     if not file_stats:
         return []
 
     paths = [f.get("path", "") for f in file_stats]
     normalized = [p.replace("\\", "/") for p in paths]
+    if hide_subfolder_components:
+        return [p.rsplit("/", 1)[-1] for p in normalized]
+
     folder_parts = [p.split("/")[:-1] for p in normalized]
 
     if any(not parts for parts in folder_parts):

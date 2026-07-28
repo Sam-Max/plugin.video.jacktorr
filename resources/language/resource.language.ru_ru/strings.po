@@ -387,3 +387,7 @@ msgstr "Clear history"
 msgctxt "#30258"
 msgid "Buffering retries"
 msgstr "Buffering retries"
+
+msgctxt "#30259"
+msgid "Hide subfolder components in file labels"
+msgstr "Скрывать компоненты подпапок в метках файлов"

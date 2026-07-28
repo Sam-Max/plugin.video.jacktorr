@@ -10,6 +10,7 @@
     </category>
     <category label="30087">
         <setting id="files_order" type="enum" label="30064" default="0" lvalues="30065|30066|30067"/>
+        <setting id="hide_subfolder_components" type="bool" label="30259" default="false"/>
         <setting id="overlay" type="bool" label="30004" default="true"/>
         <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
         <setting id="ask_to_delete" type="bool" label="30056" default="true"/>

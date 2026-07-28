@@ -53,6 +53,7 @@ from lib.settings import (
     get_min_candidate_size,
     ask_to_delete_torrent,
     get_files_order,
+    hide_subfolder_components,
     get_metadata_timeout,
     ssl_enabled,
 )
@@ -440,7 +441,9 @@ def torrent_files(info_hash):
     info = api.get_torrent_info(link=info_hash)
     file_stats = info.get("file_stats")
     file_stats = [f for f in file_stats if is_displayable(f.get("path", ""))]
-    display_names = strip_common_folder_prefix(file_stats)
+    display_names = strip_common_folder_prefix(
+        file_stats, hide_subfolder_components=hide_subfolder_components()
+    )
 
     for f, display_name in zip(file_stats, display_names):
         name = f.get("path")

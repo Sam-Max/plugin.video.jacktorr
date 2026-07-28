@@ -64,3 +64,7 @@ def get_password():
 
 def get_files_order():
     return get_int_setting("files_order")
+
+
+def hide_subfolder_components():
+    return get_boolean_setting("hide_subfolder_components")

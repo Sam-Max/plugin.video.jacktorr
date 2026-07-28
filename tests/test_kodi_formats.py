@@ -90,6 +90,19 @@ class TestStripCommonFolderPrefix:
             "Extras/interview.mkv",
         ]
 
+    def test_hides_subfolder_components_when_enabled(self):
+        paths = [
+            "Show/Season 1/ep01.mkv",
+            "Show/Season 2/ep01.mkv",
+            "Show/Extras/interview.mkv",
+        ]
+
+        result = strip_common_folder_prefix(
+            _file_stats(paths), hide_subfolder_components=True
+        )
+
+        assert result == ["ep01.mkv", "ep01.mkv", "interview.mkv"]
+
 
 class TestIsDisplayable:
     def test_video_files_are_displayable(self):
