@@ -215,7 +215,7 @@ def index():
     addDirectoryItem(
         plugin.handle,
         plugin.url_for(search_results),
-        li(30255, "download.png"),
+        li(30255, "search.png"),
         isFolder=True,
     )    
     addDirectoryItem(
