@@ -13,6 +13,8 @@ All notable changes to JackTorr are documented in this file.
 ### Changed
 
 - Torrent file lists now focus on playable files and remove shared folder prefixes.
+- An optional setting can hide subfolder names in torrent file lists.
+
 - Requested season episodes are selected automatically when available.
 - Settings are organized more clearly and include additional localizations.
 
