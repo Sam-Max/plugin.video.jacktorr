@@ -22,9 +22,9 @@
     </category>
     <category label="30089">
         <setting id="migrated" type="bool" visible="false" default="false"/>
-        <setting id="apply_settings_to_torrserver" type="bool" label="30085" default="false"/>
     </category>
     <category label="30090">
+        <setting id="apply_settings_to_torrserver" type="bool" label="30085" default="false"/>
         <setting id="s:CacheSize" label="30012" type="number" default="25" visible="eq(-1,true)" enable="eq(-1,true)" />
         <setting id="s:ReaderReadAHead" label="30013" type="number" default="95" visible="eq(-2,true)" enable="eq(-2,true)" />
         <setting id="s:PreloadCache" label="30014" type="number" default="50" visible="eq(-3,true)" enable="eq(-3,true)" />
