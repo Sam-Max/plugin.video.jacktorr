@@ -2,6 +2,11 @@
 
 All notable changes to JackTorr are documented in this file.
 
+## 1.2.1
+
+### Fixed
+- TorrServer settings are now correctly gated by the apply-settings option in Kodi.
+
 ## 1.2.0
 
 ### Added
