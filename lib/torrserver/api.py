@@ -20,20 +20,20 @@ class TorrServer(object):
         """tests server status"""
         return self._get("/echo").content
 
-    def add_magnet(self, magnet, title="", poster="", data=""):
+    def add_magnet(self, magnet, title="", poster="", data="", category=None):
+        payload = {
+            "action": "add",
+            "link": magnet,
+            "title": title,
+            "poster": poster,
+            "save_to_db": True,
+        }
+        if category is not None:
+            payload["category"] = category
         return self._parse_json_response(
             self._post(
-            "/torrents",
-            data=dumps(
-                {
-                    "action": "add",
-                    "link": magnet,
-                    "title": title,
-                    "poster": poster,
-                    "data": data,
-                    "save_to_db": True,
-                }
-            ),
+                "/torrents",
+                data=dumps(payload),
             ),
             "/torrents",
         )["hash"]
@@ -48,23 +48,24 @@ class TorrServer(object):
                         "save": "true",
                         "title": title,
                         "poster": poster,
-                        "data": data,
                     },
                 ),
                 "/torrent/upload",
             )["hash"]
 
-    def add_torrent_obj(self, obj, title="", poster="", data=""):
+    def add_torrent_obj(self, obj, title="", poster="", data="", category=None):
+        payload = {
+            "save": "true",
+            "title": title,
+            "poster": poster,
+        }
+        if category is not None:
+            payload["category"] = category
         return self._parse_json_response(
             self._post(
                 "/torrent/upload",
                 files={"file": obj},
-                data={
-                    "save": "true",
-                    "title": title,
-                    "poster": poster,
-                    "data": data,
-                },
+                data=payload,
             ),
             "/torrent/upload",
         )["hash"]
@@ -136,8 +137,6 @@ class TorrServer(object):
             payload["poster"] = poster
         if category is not None:
             payload["category"] = category
-        if data is not None:
-            payload["data"] = data
         return self._parse_json_response(
             self._post("/torrents", data=dumps(payload)),
             "/torrents",

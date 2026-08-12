@@ -100,8 +100,12 @@ class TestAddMagnet:
         torrserver._session.request.return_value = _make_response(
             {"hash": "magnet_hash_1"}
         )
-        result = torrserver.add_magnet("magnet:?xt=urn:btih:abc123", title="Test")
+        result = torrserver.add_magnet(
+            "magnet:?xt=urn:btih:abc123", title="Test", category="tv"
+        )
         assert result == "magnet_hash_1"
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert sent_data["category"] == "tv"
 
     def test_add_magnet_list_response(self, torrserver):
         """add_magnet handles list response from TorrServer (issue #193)."""
@@ -110,6 +114,16 @@ class TestAddMagnet:
         )
         result = torrserver.add_magnet("magnet:?xt=urn:btih:abc123", title="Test")
         assert result == "magnet_hash_1"
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert "category" not in sent_data
+
+    def test_data_argument_is_accepted_but_not_sent_to_torrserver(self, torrserver):
+        torrserver._session.request.return_value = _make_response({"hash": "magnet_hash_1"})
+
+        torrserver.add_magnet("magnet:?xt=urn:btih:abc123", data="legacy")
+
+        sent_data = json.loads(torrserver._session.request.call_args.kwargs["data"])
+        assert "data" not in sent_data
 
 
 class TestAddTorrentObj:
@@ -121,8 +135,9 @@ class TestAddTorrentObj:
             {"hash": "torrent_hash_1"}
         )
         mock_file = MagicMock()
-        result = torrserver.add_torrent_obj(mock_file)
+        result = torrserver.add_torrent_obj(mock_file, category="movie")
         assert result == "torrent_hash_1"
+        assert torrserver._session.request.call_args.kwargs["data"]["category"] == "movie"
 
     def test_add_torrent_obj_list_response(self, torrserver):
         """add_torrent_obj handles list response (issue #193)."""
@@ -132,6 +147,7 @@ class TestAddTorrentObj:
         mock_file = MagicMock()
         result = torrserver.add_torrent_obj(mock_file)
         assert result == "torrent_hash_1"
+        assert "category" not in torrserver._session.request.call_args.kwargs["data"]
 
     def test_add_torrent_obj_empty_list_raises_error(self, torrserver):
         """add_torrent_obj raises error on empty list."""

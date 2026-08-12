@@ -1,10 +1,18 @@
 import logging
 import os
+import re
 from threading import Thread
 import time
+from urllib.parse import parse_qs, urlsplit
 
 import requests
 from lib.torrserver.api import TorrServer, TorrServerError
+from lib.torrserver.display_metadata import (
+    delete_display_metadata,
+    get_display_metadata,
+    prune_display_metadata,
+    save_display_metadata,
+)
 import routing
 from xbmc import Monitor, executebuiltin, getInfoLabel, getCondVisibility, sleep
 from xbmcgui import ListItem, DialogProgress, Dialog
@@ -198,7 +206,9 @@ def handle_player_stop(info_hash, name, initial_delay=0.5, listing_timeout=10):
 
     remove_torrent = Dialog().yesno(translate(30242), translate(30241))
     if remove_torrent:
-        api.remove_torrent(info_hash)
+        response = api.remove_torrent(info_hash)
+        if getattr(response, "status_code", None) == 200:
+            delete_display_metadata(api._base_url, info_hash)
         current_folder = getInfoLabel("Container.FolderPath")
         if current_folder == plugin.url_for(torrent_files, info_hash):
             executebuiltin("Action(Back)")
@@ -235,46 +245,96 @@ def index():
 @plugin.route("/torrents")
 @check_directory
 def torrents():
-    for torrent in api.torrents():
-        info_hash = torrent.get("hash")
-
-        context_menu_items = [
-            (translate(30235), media(play_info_hash, info_hash=info_hash))
-        ]
-
-        if torrent.get("stat") in [2, 3]:
-            context_menu_items.append(
-                (translate(30208), action(torrent_action, info_hash, "drop"))
-            )
-
-        context_menu_items.extend(
-            [
-                (
-                    translate(30242),
-                    action(torrent_action, info_hash, "remove_torrent"),
-                ),
-                (
-                    translate(30245),
-                    action(torrent_action, info_hash, "torrent_status"),
-                ),
-            ]
-        )
-
-        context_menu_items.append(
-            (translate(30248), action(torrent_action, info_hash, "set_poster"))
-        )
-        context_menu_items.append(
-            (translate(30250), action(torrent_action, info_hash, "set_category"))
-        )
-
-        torrent_li = list_item(torrent.get("title", ""), "download.png", poster=torrent.get("poster"))
-        torrent_li.addContextMenuItems(context_menu_items)
+    torrent_list = api.torrents()
+    prune_display_metadata(api._base_url)
+    categories = {torrent_category(torrent) for torrent in torrent_list}
+    for category in sorted(categories, key=lambda value: (value is not None, value or "")):
+        label = category if category is not None else translate(30260)
+        if category is None:
+            url = plugin.url_for(uncategorized_torrents)
+        else:
+            url = plugin.url_for(category_torrents, category=category)
         addDirectoryItem(
             plugin.handle,
-            plugin.url_for(torrent_files, info_hash),
-            torrent_li,
+            url,
+            list_item(label, "torrents.png"),
             isFolder=True,
         )
+
+
+@plugin.route("/torrents/category")
+@query_arg("category")
+@check_directory
+def category_torrents(category):
+    list_category_torrents(category)
+
+
+@plugin.route("/torrents/uncategorized")
+@check_directory
+def uncategorized_torrents():
+    list_category_torrents(None)
+
+
+def torrent_category(torrent):
+    category = torrent.get("category") if isinstance(torrent, dict) else None
+    return category if isinstance(category, str) and category else None
+
+
+def list_category_torrents(category):
+    torrent_list = api.torrents()
+    prune_display_metadata(api._base_url)
+    for torrent in torrent_list:
+        if torrent_category(torrent) == category:
+            add_torrent_item(torrent)
+
+
+def add_torrent_item(torrent):
+    info_hash = torrent.get("hash")
+    display_metadata = get_display_metadata(api._base_url, info_hash)
+    display_title = display_metadata.get("title") or torrent.get("title", "")
+    display_plot = display_metadata.get("plot", "")
+    display_poster = display_metadata.get("poster") or torrent.get("poster")
+
+    context_menu_items = [
+        (translate(30235), media(play_info_hash, info_hash=info_hash))
+    ]
+
+    if torrent.get("stat") in [2, 3]:
+        context_menu_items.append(
+            (translate(30208), action(torrent_action, info_hash, "drop"))
+        )
+
+    context_menu_items.extend(
+        [
+            (
+                translate(30242),
+                action(torrent_action, info_hash, "remove_torrent"),
+            ),
+            (
+                translate(30245),
+                action(torrent_action, info_hash, "torrent_status"),
+            ),
+        ]
+    )
+
+    context_menu_items.append(
+        (translate(30248), action(torrent_action, info_hash, "set_poster"))
+    )
+    context_menu_items.append(
+        (translate(30250), action(torrent_action, info_hash, "set_category"))
+    )
+
+    torrent_li = list_item(
+        display_title, "download.png", poster=display_poster
+    )
+    set_info_tag(torrent_li, "video", {"title": display_title, "plot": display_plot})
+    torrent_li.addContextMenuItems(context_menu_items)
+    addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(torrent_files, info_hash),
+        torrent_li,
+        isFolder=True,
+    )
 
 
 @plugin.route("/torrents/<info_hash>/<action_str>")
@@ -284,7 +344,9 @@ def torrent_action(info_hash, action_str):
     if action_str == "drop":
         api.drop_torrent(info_hash)
     elif action_str == "remove_torrent":
-        api.remove_torrent(info_hash)
+        response = api.remove_torrent(info_hash)
+        if getattr(response, "status_code", None) == 200:
+            delete_display_metadata(api._base_url, info_hash)
     elif action_str == "torrent_status":
         torrent_status(info_hash)
         needs_refresh = False
@@ -435,10 +497,27 @@ def sort_files(files):
         files.sort(key=lambda k: k.length)
 
 
+def _magnet_info_hash(magnet):
+    try:
+        for value in parse_qs(urlsplit(magnet).query).get("xt", []):
+            prefix = "urn:btih:"
+            if value.lower().startswith(prefix):
+                info_hash = value[len(prefix) :]
+                if re.fullmatch(r"[0-9a-fA-F]{40}", info_hash):
+                    return info_hash
+    except (TypeError, ValueError):
+        pass
+    return ""
+
+
 @plugin.route("/torrents/<info_hash>")
 @check_directory
 def torrent_files(info_hash):
     info = api.get_torrent_info(link=info_hash)
+    display_metadata = get_display_metadata(api._base_url, info_hash)
+    display_title = display_metadata.get("title") or info.get("title", "")
+    display_plot = display_metadata.get("plot", "")
+    display_poster = display_metadata.get("poster") or info.get("poster")
     file_stats = info.get("file_stats")
     file_stats = [f for f in file_stats if is_displayable(f.get("path", ""))]
     display_names = strip_common_folder_prefix(
@@ -449,11 +528,11 @@ def torrent_files(info_hash):
         name = f.get("path")
         id = f.get("id")
         serve_url = api.get_stream_url(link=info_hash, path=f.get("path"), file_id=id)
-        file_li = list_item(display_name, "download.png", poster=info.get("poster"))
+        file_li = list_item(display_name, "download.png", poster=display_poster)
         file_li.setPath(serve_url)
 
         context_menu_items = []
-        info_labels = {"title": info.get("title")}
+        info_labels = {"title": display_title, "plot": display_plot}
         kwargs = dict(info_hash=info_hash, file_id=id, path=name)
 
         if is_picture(name):
@@ -500,19 +579,29 @@ def display_text(info_hash, file_id, path):
 @plugin.route("/play_url")
 @query_arg("url")
 @query_arg("poster", required=False)
+@query_arg("title", required=False)
+@query_arg("description", required=False)
+@query_arg("category", required=False)
 @query_arg("season", required=False)
 @query_arg("episode", required=False)
 @check_playable
-def play_url(url, buffer=True, poster="", season="", episode=""):
+def play_url(
+    url, buffer=True, poster="", title="", description="", category="", season="", episode=""
+):
     try:
         with requests.get(url, stream=True, timeout=30) as r:
             r.raise_for_status()
-            info_hash = api.add_torrent_obj(r.raw, poster=poster)
+            info_hash = api.add_torrent_obj(
+                r.raw, title=title, poster=poster, category=category or None
+            )
+            save_display_metadata(api._base_url, info_hash, title=title, plot=description, poster=poster)
     except requests.RequestException as e:
         raise PlayError("Failed to download torrent: {}".format(e))
     play_info_hash(
         info_hash=info_hash,
         buffer=buffer,
+        title=title,
+        description=description,
         season=season,
         episode=episode,
     )
@@ -521,14 +610,29 @@ def play_url(url, buffer=True, poster="", season="", episode=""):
 @plugin.route("/play_magnet")
 @query_arg("magnet")
 @query_arg("poster", required=False)
+@query_arg("title", required=False)
+@query_arg("description", required=False)
+@query_arg("category", required=False)
 @query_arg("season", required=False)
 @query_arg("episode", required=False)
 @check_playable
-def play_magnet(magnet, buffer=True, poster="", season="", episode=""):
-    info_hash = api.add_magnet(magnet, poster=poster)
+def play_magnet(
+    magnet, buffer=True, poster="", title="", description="", category="", season="", episode=""
+):
+    known_hash = _magnet_info_hash(magnet)
+    if known_hash:
+        save_display_metadata(
+            api._base_url, known_hash, title=title, plot=description, poster=poster
+        )
+    info_hash = api.add_magnet(
+        magnet, title=title, poster=poster, category=category or None
+    )
+    save_display_metadata(api._base_url, info_hash, title=title, plot=description, poster=poster)
     play_info_hash(
         info_hash=info_hash,
         buffer=buffer,
+        title=title,
+        description=description,
         season=season,
         episode=episode,
     )
@@ -548,7 +652,7 @@ def play_file(path, buffer=True, poster=""):
 @query_arg("season", required=False)
 @query_arg("episode", required=False)
 @check_playable
-def play_info_hash(info_hash, buffer=True, season="", episode=""):
+def play_info_hash(info_hash, buffer=True, title="", description="", season="", episode=""):
     try:
         info = api.get_torrent_info(info_hash)
     except TorrServerError as e:
@@ -590,17 +694,23 @@ def play_info_hash(info_hash, buffer=True, season="", episode=""):
                 raise PlayError("User canceled dialog select")
             chosen_file = candidate_files[chosen_index]
 
+    playback_metadata = {}
+    if title or description:
+        playback_metadata = {"title": title, "description": description}
+
     if buffer:
         buffer_and_play(
             info_hash=info_hash,
             file_id=chosen_file.get("id"),
             path=chosen_file.get("path"),
+            **playback_metadata,
         )
     else:
         play(
             info_hash=info_hash,
             file_id=chosen_file.get("id"),
             path=chosen_file.get("path"),
+            **playback_metadata,
         )
 
 
@@ -646,7 +756,7 @@ def wait_for_metadata(info_hash):
 @query_arg("file_id")
 @query_arg("path")
 @check_playable
-def buffer_and_play(info_hash, file_id, path):
+def buffer_and_play(info_hash, file_id, path, title="", description=""):
     preload_torrent(info_hash, file_id)
     try:
         info = api.get_torrent_info(info_hash)
@@ -658,7 +768,14 @@ def buffer_and_play(info_hash, file_id, path):
         wait_for_metadata(info_hash)
     wait_for_buffering_completion(info_hash, file_id)
     poster = info.get("poster")
-    play(info_hash=info_hash, file_id=file_id, path=path, poster=poster)
+    play(
+        info_hash=info_hash,
+        file_id=file_id,
+        path=path,
+        poster=poster,
+        title=title,
+        description=description,
+    )
 
 
 def preload_torrent(info_hash, file_id):
@@ -804,12 +921,14 @@ def wait_for_buffering_completion(info_hash, file_id):
 @query_arg("path")
 @query_arg("poster", required=False)
 @check_playable
-def play(info_hash, file_id, path, poster=""):
+def play(info_hash, file_id, path, poster="", title="", description=""):
     name = path
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
-    item = ListItem(name, path=serve_url)
+    item = ListItem(title or name, path=serve_url)
     if poster:
         item.setArt({"poster": poster})
+    if title or description:
+        set_info_tag(item, "video", {"title": title or name, "plot": description})
 
     # Prevent Kodi's synchronous pre-playback external-subtitle scan from opening
     # the TorrServer stream URL. Kodi's GetParentPath keeps the ?link=&index= query,

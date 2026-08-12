@@ -25,6 +25,11 @@ def set_info_tag(list_item, info_type, info_labels):
     if info_type == "video" and hasattr(list_item, "getVideoInfoTag"):
         tag = list_item.getVideoInfoTag()
         tag.setTitle(info_labels.get("title"))
+        if "plot" in info_labels:
+            if hasattr(tag, "setPlot"):
+                tag.setPlot(info_labels["plot"])
+            else:
+                list_item.setInfo(info_type, info_labels)
     elif info_type == "music" and hasattr(list_item, "getMusicInfoTag"):
         tag = list_item.getMusicInfoTag()
         tag.setTitle(info_labels.get("title"))

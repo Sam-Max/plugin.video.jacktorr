@@ -539,3 +539,7 @@ msgstr "Buffering retries"
 msgctxt "#30259"
 msgid "Hide subfolder components in file labels"
 msgstr "Ocultar componentes de subcarpetas en etiquetas de archivos"
+
+msgctxt "#30260"
+msgid "Uncategorized"
+msgstr "Sin categoría"

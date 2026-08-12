@@ -1,6 +1,6 @@
 import sys
 import types
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 
 class _Addon:
@@ -104,7 +104,8 @@ from lib import navigation
 
 
 def test_play_magnet_forwards_episode_metadata_to_play_info_hash(monkeypatch):
-    monkeypatch.setattr(navigation.api, "add_magnet", lambda *_args, **_kwargs: "hash")
+    add_magnet = MagicMock(return_value="hash")
+    monkeypatch.setattr(navigation.api, "add_magnet", add_magnet)
     play_info_hash = MagicMock()
     monkeypatch.setattr(navigation, "play_info_hash", play_info_hash)
 
@@ -112,22 +113,64 @@ def test_play_magnet_forwards_episode_metadata_to_play_info_hash(monkeypatch):
         magnet="magnet:?xt=urn:btih:abc",
         buffer=False,
         poster="poster",
+        title="Localized title",
+        description="Localized description",
+        category="tv",
         season="1",
         episode="5",
     )
 
     play_info_hash.assert_called_once_with(
-        info_hash="hash", buffer=False, season="1", episode="5"
+        info_hash="hash",
+        buffer=False,
+        title="Localized title",
+        description="Localized description",
+        season="1",
+        episode="5",
     )
+    add_magnet.assert_called_once_with(
+        "magnet:?xt=urn:btih:abc", title="Localized title", poster="poster", category="tv"
+    )
+
+
+def test_play_magnet_persists_display_metadata(monkeypatch):
+    monkeypatch.setattr(navigation.api, "add_magnet", MagicMock(return_value="a" * 40))
+    save_metadata = MagicMock()
+    monkeypatch.setattr(navigation, "save_display_metadata", save_metadata)
+    monkeypatch.setattr(navigation, "play_info_hash", MagicMock())
+
+    navigation.play_magnet(
+        magnet="magnet:?xt=urn:btih:abc", title="Localized title", description="Plot", poster="poster"
+    )
+
+    save_metadata.assert_called_once_with(
+        navigation.api._base_url, "a" * 40, title="Localized title", plot="Plot", poster="poster"
+    )
+
+
+def test_play_magnet_persists_before_and_after_a_known_hash(monkeypatch):
+    info_hash = "a" * 40
+    monkeypatch.setattr(navigation.api, "add_magnet", MagicMock(return_value=info_hash))
+    save_metadata = MagicMock()
+    monkeypatch.setattr(navigation, "save_display_metadata", save_metadata)
+    monkeypatch.setattr(navigation, "play_info_hash", MagicMock())
+
+    navigation.play_magnet(
+        magnet="magnet:?xt=urn:btih:{}".format(info_hash), title="Localized title", description="Plot", poster="poster"
+    )
+
+    assert save_metadata.call_args_list == [
+        call(navigation.api._base_url, info_hash, title="Localized title", plot="Plot", poster="poster"),
+        call(navigation.api._base_url, info_hash, title="Localized title", plot="Plot", poster="poster"),
+    ]
 
 
 def test_play_url_forwards_episode_metadata_to_play_info_hash(monkeypatch):
     response = MagicMock()
     response.__enter__.return_value = response
     monkeypatch.setattr(navigation.requests, "get", lambda *_args, **_kwargs: response)
-    monkeypatch.setattr(
-        navigation.api, "add_torrent_obj", lambda *_args, **_kwargs: "hash"
-    )
+    add_torrent_obj = MagicMock(return_value="hash")
+    monkeypatch.setattr(navigation.api, "add_torrent_obj", add_torrent_obj)
     play_info_hash = MagicMock()
     monkeypatch.setattr(navigation, "play_info_hash", play_info_hash)
 
@@ -135,13 +178,54 @@ def test_play_url_forwards_episode_metadata_to_play_info_hash(monkeypatch):
         url="https://example.com/show.torrent",
         buffer=False,
         poster="poster",
+        title="Localized title",
+        description="Localized description",
+        category="movie",
         season="1",
         episode="5",
     )
 
     play_info_hash.assert_called_once_with(
-        info_hash="hash", buffer=False, season="1", episode="5"
+        info_hash="hash",
+        buffer=False,
+        title="Localized title",
+        description="Localized description",
+        season="1",
+        episode="5",
     )
+    add_torrent_obj.assert_called_once_with(
+        response.raw, title="Localized title", poster="poster", category="movie"
+    )
+
+
+def test_play_uses_metadata_for_list_item_and_video_info_tag(monkeypatch):
+    item = MagicMock()
+    tag = MagicMock()
+    item.getVideoInfoTag.return_value = tag
+    list_item = MagicMock(return_value=item)
+    player = MagicMock()
+    player.__enter__.return_value = player
+    monkeypatch.setattr(navigation, "ListItem", list_item)
+    monkeypatch.setattr(navigation, "JackTorrPlayer", MagicMock(return_value=player))
+    monkeypatch.setattr(navigation, "setResolvedUrl", MagicMock())
+    monkeypatch.setattr(navigation, "show_status_overlay", lambda: False)
+    monkeypatch.setattr(
+        navigation.api, "get_stream_url", lambda **_kwargs: "http://stream.example/video"
+    )
+
+    navigation.play(
+        info_hash="hash",
+        file_id=1,
+        path="release.mkv",
+        poster="poster.jpg",
+        title="Localized title",
+        description="Localized description",
+    )
+
+    list_item.assert_called_once_with("Localized title", path="http://stream.example/video")
+    item.setArt.assert_called_once_with({"poster": "poster.jpg"})
+    tag.setTitle.assert_called_once_with("Localized title")
+    tag.setPlot.assert_called_once_with("Localized description")
 
 
 def _run_play_info_hash(monkeypatch, files, dialog_index=0, **metadata):
@@ -224,3 +308,25 @@ def test_torrent_files_uses_original_path_for_stream_url(monkeypatch):
     navigation.torrent_files("hash")
 
     stream_url.assert_called_once_with(link="hash", path=path, file_id=7)
+
+
+def test_torrent_files_uses_shared_display_plot_and_falls_back_without_metadata(monkeypatch):
+    item = MagicMock()
+    set_info_tag = MagicMock()
+    monkeypatch.setattr(
+        navigation.api,
+        "get_torrent_info",
+        lambda **_kwargs: {"file_stats": [{"id": 7, "path": "movie.mkv"}], "title": "Server title", "poster": "Server poster"},
+    )
+    monkeypatch.setattr(navigation.api, "get_stream_url", lambda **_kwargs: "http://stream")
+    monkeypatch.setattr(navigation, "list_item", MagicMock(return_value=item))
+    monkeypatch.setattr(navigation, "set_info_tag", set_info_tag)
+    monkeypatch.setattr(navigation, "get_display_metadata", lambda *_args: {
+        "title": "Shared", "plot": "Plot", "poster": "Poster"
+    })
+    monkeypatch.setattr(navigation, "addDirectoryItem", MagicMock())
+
+    navigation.torrent_files("a" * 40)
+
+    navigation.list_item.assert_called_once_with("movie.mkv", "download.png", poster="Poster")
+    set_info_tag.assert_called_once_with(item, "video", {"title": "Shared", "plot": "Plot"})
