@@ -2,6 +2,12 @@
 
 All notable changes to JackTorr are documented in this file.
 
+## 1.2.2
+
+### Added
+- Torrent lists are organized by categories, including uncategorized torrents.
+- Display titles, descriptions, and posters are retained for added torrents.
+
 ## 1.2.1
 
 ### Fixed
