@@ -121,6 +121,53 @@ class TorrServer(object):
         )
         return result
 
+    def search_torznab(self, query, index=-1):
+        """search torrents via Torznab indexers (GET /torznab/search/?query=...&index=...).
+
+        Requires EnableTorznabSearch=true and configured indexers in TorrServer
+        settings. Returns the raw JSON list from TorrServer — same TorrentDetails
+        shape as /search/ results. Empty list when search is disabled or no
+        results — do NOT use _parse_json_response (it raises on empty list).
+
+        TorrServer returns HTTP 400 with body [] when Torznab search is
+        disabled; treat that as an empty result rather than an error so the
+        caller can show the localized 'enable Torznab' hint instead of a raw
+        HTTP 400 message.
+        """
+        logging.info(
+            "TorrServer torznab search: query=%r index=%d base_url=%s",
+            query,
+            index,
+            self._base_url,
+        )
+        response = self._get(
+            "/torznab/search/", params={"query": query, "index": index}
+        )
+        logging.info(
+            "TorrServer torznab search: HTTP %d, body[:200]=%r",
+            response.status_code,
+            getattr(response, "text", "")[:200],
+        )
+        if response.status_code not in (200, 400):
+            raise TorrServerError(
+                "TorrServer /torznab/search returned HTTP {}".format(
+                    response.status_code
+                ),
+                status_code=response.status_code,
+            )
+        try:
+            result = response.json()
+        except ValueError:
+            raise TorrServerError(
+                "TorrServer /torznab/search returned invalid JSON",
+                status_code=response.status_code,
+            )
+        logging.info(
+            "TorrServer torznab search: parsed %d results",
+            len(result) if isinstance(result, list) else -1,
+        )
+        return result
+
     def get_torrent_info_by_hash(self, hash):
         """not extended info"""
         return self._parse_json_response(

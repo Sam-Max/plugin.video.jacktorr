@@ -231,6 +231,12 @@ def index():
     )    
     addDirectoryItem(
         plugin.handle,
+        plugin.url_for(torznab_search_results),
+        li(30261, "search.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        plugin.handle,
         plugin.url_for(dialog_insert),
         li(30207, "add.png"),
         isFolder=False,
@@ -371,7 +377,8 @@ def torrent_action(info_hash, action_str):
 
 
 @plugin.route("/new_search")
-def new_search():
+@query_arg("source", required=False)
+def new_search(source="rutor"):
     query = Dialog().input(translate(30252))
     if not query:
         logging.info("Search: user cancelled input dialog")
@@ -379,9 +386,10 @@ def new_search():
         return
     # Record the term so it appears in the history next time.
     add_search(query)
+    results_route = torznab_search_results if source == "torznab" else search_results
     executebuiltin(
         "Container.Update({}, replace)".format(
-            plugin.url_for(search_results, query=query)
+            plugin.url_for(results_route, query=query)
         )
     )
 
@@ -449,6 +457,74 @@ def search_results(query=None):
         size = r.get("Size", "")
         # Size is a human-readable string ("42.93 GB"), not bytes.
         label = "{} ({})".format(title, size) if size else title
+        item = list_item(label, "download.png")
+        item.setProperty("IsPlayable", "true")
+        context_menu_items = [
+            (translate(30254), media(play_magnet, magnet=magnet, poster=""))
+        ]
+        item.addContextMenuItems(context_menu_items)
+        url = plugin.url_for(play_magnet, magnet=magnet, buffer=True, poster="")
+        addDirectoryItem(plugin.handle, url, item, isFolder=False)
+
+
+@plugin.route("/torznab_search_results")
+@query_arg("query", required=False)
+@check_directory
+def torznab_search_results(query=None):
+    if not query:
+        logging.info("Torznab search: /torznab_search_results reached with no query")
+        item = li(30256, "download.png")
+        item.setProperty("IsPlayable", "false")
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(new_search, source="torznab"),
+            item,
+            isFolder=False,
+        )
+        for term in load_history():
+            addDirectoryItem(
+                plugin.handle,
+                plugin.url_for(torznab_search_results, query=term),
+                list_item(term, "download.png"),
+                isFolder=True,
+            )
+        item = li(30257, "download.png")
+        item.setProperty("IsPlayable", "false")
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(clear_search_history),
+            item,
+            isFolder=False,
+        )
+        return
+    try:
+        results = api.search_torznab(query)
+    except TorrServerError as e:
+        logging.warning("Torznab search: TorrServerError: %s", e)
+        notification(str(e))
+        return
+    logging.info(
+        "Torznab search: query=%r returned %d results",
+        query,
+        len(results) if hasattr(results, "__len__") else -1,
+    )
+    if not results:
+        logging.info("Torznab search: no results, showing notification")
+        notification(translate(30262))
+        return
+    for r in results:
+        magnet = r.get("Magnet", "")
+        if not magnet:
+            continue
+        title = r.get("Title", "") or r.get("Name", "")
+        size = r.get("Size", "")
+        # Size is a human-readable string ("42.93 GB"), not bytes.
+        label = title
+        tracker = r.get("Tracker")
+        if tracker:
+            label = "{} [{}]".format(label, tracker)
+        if size:
+            label = "{} ({})".format(label, size)
         item = list_item(label, "download.png")
         item.setProperty("IsPlayable", "true")
         context_menu_items = [

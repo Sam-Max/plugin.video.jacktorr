@@ -543,3 +543,11 @@ msgstr "Ocultar componentes de subpastas nos rótulos dos ficheiros"
 msgctxt "#30260"
 msgid "Uncategorized"
 msgstr "Sem categoria"
+
+msgctxt "#30261"
+msgid "Torznab search"
+msgstr "Pesquisa Torznab"
+
+msgctxt "#30262"
+msgid "No results (check that Torznab search is enabled in TorrServer)"
+msgstr "Nenhum resultado (verifique se a pesquisa Torznab está ativada no TorrServer)"

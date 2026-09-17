@@ -355,3 +355,50 @@ class TestSearch:
         with pytest.raises(TorrServerError) as exc:
             torrserver.search("x")
         assert exc.value.status_code == 500
+
+
+class TestTorznabSearch:
+    """Tests for TorrServer.search_torznab (GET /torznab/search/?query=...&index=...)."""
+
+    def test_torznab_search_returns_raw_list(self, torrserver):
+        """search_torznab issues a GET to /torznab/search/ with the query/index params
+        and returns the raw list."""
+        torrserver._session.request.return_value = _make_response(
+            [{"Title": "X", "Magnet": "magnet:..."}]
+        )
+        result = torrserver.search_torznab("matrix")
+        assert isinstance(result, list)
+        assert result[0]["Title"] == "X"
+        call = torrserver._session.request.call_args
+        assert call.args[0] == "get"
+        assert "/torznab/search/" in call.args[1]
+        assert call.kwargs["params"] == {"query": "matrix", "index": -1}
+
+    def test_torznab_search_empty_list_when_no_results(self, torrserver):
+        """search_torznab returns [] — must NOT raise (unlike _parse_json_response)."""
+        torrserver._session.request.return_value = _make_response([])
+        result = torrserver.search_torznab("nothing")
+        assert result == []
+
+    def test_torznab_search_400_disabled_returns_empty_list(self, torrserver):
+        """TorrServer returns HTTP 400 + [] when Torznab search is disabled —
+        treat as an empty result so the caller can show the localized hint
+        instead of a raw 'HTTP 400' error."""
+        torrserver._session.request.return_value = _make_response([], status_code=400)
+        result = torrserver.search_torznab("x")
+        assert result == []
+
+    def test_torznab_search_raises_on_http_error(self, torrserver):
+        """Non-200/400 status raises TorrServerError."""
+        torrserver._session.request.return_value = _make_response({}, status_code=500)
+        with pytest.raises(TorrServerError) as exc:
+            torrserver.search_torznab("x")
+        assert exc.value.status_code == 500
+
+    def test_torznab_search_passes_index_param(self, torrserver):
+        """search_torznab passes index=-1 by default (all configured indexers)."""
+        torrserver._session.request.return_value = _make_response([])
+        torrserver.search_torznab("x")
+        call = torrserver._session.request.call_args
+        assert call.kwargs["params"]["query"] == "x"
+        assert call.kwargs["params"]["index"] == -1

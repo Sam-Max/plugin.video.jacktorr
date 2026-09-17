@@ -395,3 +395,11 @@ msgstr "Скрывать компоненты подпапок в метках �
 msgctxt "#30260"
 msgid "Uncategorized"
 msgstr "Без категории"
+
+msgctxt "#30261"
+msgid "Torznab search"
+msgstr "Поиск Torznab"
+
+msgctxt "#30262"
+msgid "No results (check that Torznab search is enabled in TorrServer)"
+msgstr "Нет результатов (проверьте, включён ли поиск Torznab в TorrServer)"

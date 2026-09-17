@@ -395,3 +395,11 @@ msgstr "Hide subfolder components in file labels"
 msgctxt "#30260"
 msgid "Uncategorized"
 msgstr "Uncategorized"
+
+msgctxt "#30261"
+msgid "Torznab search"
+msgstr "Torznab search"
+
+msgctxt "#30262"
+msgid "No results (check that Torznab search is enabled in TorrServer)"
+msgstr "No results (check that Torznab search is enabled in TorrServer)"

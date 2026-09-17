@@ -395,3 +395,11 @@ msgstr "Ascunde componentele subfolderelor din etichetele fișierelor"
 msgctxt "#30260"
 msgid "Uncategorized"
 msgstr "Fără categorie"
+
+msgctxt "#30261"
+msgid "Torznab search"
+msgstr "Căutare Torznab"
+
+msgctxt "#30262"
+msgid "No results (check that Torznab search is enabled in TorrServer)"
+msgstr "Niciun rezultat (verificați că căutarea Torznab este activată în TorrServer)"

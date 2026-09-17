@@ -543,3 +543,11 @@ msgstr "Ocultar componentes de subcarpetas en etiquetas de archivos"
 msgctxt "#30260"
 msgid "Uncategorized"
 msgstr "Sin categoría"
+
+msgctxt "#30261"
+msgid "Torznab search"
+msgstr "Búsqueda Torznab"
+
+msgctxt "#30262"
+msgid "No results (check that Torznab search is enabled in TorrServer)"
+msgstr "Sin resultados (comprueba que la búsqueda Torznab esté activada en TorrServer)"
