@@ -52,7 +52,7 @@ msgstr "Limită conexiuni"
 
 msgctxt "#30012"
 msgid "Cache size (MB)"
-msgstr "Dimensiune cache (MB)"
+msgstr "Mărime cache (MB)"
 
 msgctxt "#30013"
 msgid "ReaderReadAHead"
@@ -96,7 +96,7 @@ msgstr "Rată maximă încărcare (B/s)"
 
 msgctxt "#30036"
 msgid "Peers Listen Port"
-msgstr "Port ascultare peers"
+msgstr "Port de ascultare pentru peeri"
 
 msgctxt "#30037"
 msgid "DhtConnectionLimit"
@@ -104,7 +104,7 @@ msgstr "Limită conexiuni DHT"
 
 msgctxt "#30038"
 msgid "TorrentDisconnectTimeout"
-msgstr "Timp limită deconectare torrent"
+msgstr "Timeout deconectare torrent"
 
 msgctxt "#30039"
 msgid "Force Encrypt"
@@ -132,7 +132,7 @@ msgstr "Dezactivează PEX"
 
 msgctxt "#30046"
 msgid "Disable Upload"
-msgstr "Dezactivează încărcarea"
+msgstr "Dezactivează Upload"
 
 msgctxt "#30047"
 msgid "RetrackersMode"
@@ -152,7 +152,7 @@ msgstr "Activează depanarea"
 
 msgctxt "#30051"
 msgid "Host"
-msgstr "Gazdă"
+msgstr "Host"
 
 msgctxt "#30052"
 msgid "Port"
@@ -168,7 +168,7 @@ msgstr "Parolă"
 
 msgctxt "#30055"
 msgid "Minimum video candidate size (MB)"
-msgstr "Dimensiune minimă candidat video (MB)"
+msgstr "Mărimea minimă a fișierului video (MB)"
 
 msgctxt "#30056"
 msgid "Ask to remove torrent after streaming"
@@ -196,7 +196,7 @@ msgstr "Nume"
 
 msgctxt "#30067"
 msgid "Size"
-msgstr "Dimensiune"
+msgstr "Mărime"
 
 msgctxt "#30071"
 msgid "Enable DLNA"
@@ -208,7 +208,7 @@ msgstr "Activează RutorSearch"
 
 msgctxt "#30081"
 msgid "Metadata timeout"
-msgstr "Timp limită metadate"
+msgstr "Timeout metadate"
 
 msgctxt "#30085"
 msgid "Apply settings to TorrServer"
@@ -250,7 +250,7 @@ msgstr "Eroare..."
 # Plugin
 msgctxt "#30200"
 msgid "Insert file or URL"
-msgstr "Introdu fișier sau URL"
+msgstr "Introdu un fișier sau un URL"
 
 msgctxt "#30201"
 msgid "URL"
@@ -310,7 +310,7 @@ msgstr "Timpul de așteptare pentru metadate a expirat"
 
 msgctxt "#30239"
 msgid "No candidate files found"
-msgstr "Nu s-au găsit fișiere candidate"
+msgstr "Nu s-au găsit fișiere potrivite"
 
 msgctxt "#30240"
 msgid "Please choose what file to play"
@@ -358,7 +358,7 @@ msgstr "Setează categorie"
 
 msgctxt "#30251"
 msgid "Enter category"
-msgstr "Introduce categoria"
+msgstr "Introdu categoria"
 
 msgctxt "#30252"
 msgid "Search torrents"
@@ -366,7 +366,7 @@ msgstr "Caută torrente"
 
 msgctxt "#30253"
 msgid "No results (check that Rutor search is enabled in TorrServer)"
-msgstr "Fără rezultate (verificați că căutarea Rutor este activă în TorrServer)"
+msgstr "Niciun rezultat (verificați dacă funcția de căutare Rutor este activată în TorrServer)"
 
 msgctxt "#30254"
 msgid "Play"
@@ -378,15 +378,15 @@ msgstr "Căutare Rutor"
 
 msgctxt "#30256"
 msgid "New search"
-msgstr "New search"
+msgstr "Căutare nouă"
 
 msgctxt "#30257"
 msgid "Clear history"
-msgstr "Clear history"
+msgstr "Șterge istoricul"
 
 msgctxt "#30258"
 msgid "Buffering retries"
-msgstr "Buffering retries"
+msgstr "Încercări repetate de buffering"
 
 msgctxt "#30259"
 msgid "Hide subfolder components in file labels"
@@ -394,7 +394,7 @@ msgstr "Ascunde componentele subfolderelor din etichetele fișierelor"
 
 msgctxt "#30260"
 msgid "Uncategorized"
-msgstr "Fără categorie"
+msgstr "Necategorizat"
 
 msgctxt "#30261"
 msgid "Torznab search"
@@ -402,7 +402,7 @@ msgstr "Căutare Torznab"
 
 msgctxt "#30262"
 msgid "No results (check that Torznab search is enabled in TorrServer)"
-msgstr "Niciun rezultat (verificați că căutarea Torznab este activată în TorrServer)"
+msgstr "Niciun rezultat (verificați dacă funcția de căutare Torznab este activată în TorrServer)"
 
 msgctxt "#30263"
 msgid "All Torrents"
