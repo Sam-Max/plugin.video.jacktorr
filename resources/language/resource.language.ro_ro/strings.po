@@ -394,7 +394,7 @@ msgstr "Ascunde componentele subfolderelor din etichetele fișierelor"
 
 msgctxt "#30260"
 msgid "Uncategorized"
-msgstr "Fără categorie"
+msgstr "Necategorizat"
 
 msgctxt "#30261"
 msgid "Torznab search"
