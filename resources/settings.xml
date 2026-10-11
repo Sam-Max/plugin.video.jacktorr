@@ -14,6 +14,8 @@
         <setting id="overlay" type="bool" label="30004" default="true"/>
         <setting id="min_candidate_size" type="slider" label="30055" option="int" range="0,10,200" default="100"/>
         <setting id="ask_to_delete" type="bool" label="30056" default="true"/>
+        <setting id="show_rutor_search" type="bool" label="30268" default="false"/>
+        <setting id="show_torznab_search" type="bool" label="30269" default="false"/>
     </category>
     <category label="30088">
         <setting id="metadata_timeout" type="slider" label="30081" option="int" range="0,10,120" default="30"/>
@@ -49,5 +51,6 @@
         <setting id="s:EnableDebug" label="30050" type="bool" default="false" visible="eq(-22,true)" enable="eq(-22,true)" />
         <setting id="s:EnableDLNA" label="30071" type="bool" default="false" visible="eq(-23,true)" enable="eq(-23,true)" />
         <setting id="s:EnableRutorSearch" label="30072" type="bool" default="false" visible="eq(-24,true)" enable="eq(-24,true)" />
+        <setting id="s:EnableTorznabSearch" label="30270" type="bool" default="false" visible="eq(-25,true)" enable="eq(-25,true)" />
     </category>
 </settings>

@@ -94,7 +94,19 @@ class DaemonMonitor(xbmc.Monitor):
                 "Failed getting daemon settings with code %d: %s", r.status_code, r.text
             )
             return None
-        return r.json()
+        try:
+            daemon_settings = r.json()
+        except ValueError:
+            logging.error(
+                "Failed decoding daemon settings response as JSON; refusing to sync"
+            )
+            return None
+        if not isinstance(daemon_settings, dict):
+            logging.error(
+                "Daemon settings payload is not a JSON object; refusing to sync"
+            )
+            return None
+        return daemon_settings
 
     def _update_kodi_settings(self):
         daemon_settings = self._get_daemon_settings()
@@ -130,11 +142,17 @@ class DaemonMonitor(xbmc.Monitor):
             return False
 
         kodi_settings = self._get_kodi_settings()
-        if daemon_settings != kodi_settings:
+        # Overlay only the addon-managed settings on the current daemon
+        # configuration: TorrServer replaces its whole config on "set", so any
+        # unmanaged field (indexers, Torznab URLs, nested keys) must be carried
+        # over verbatim or it would be lost.
+        merged_settings = dict(daemon_settings)
+        merged_settings.update(kodi_settings)
+        if merged_settings != daemon_settings:
             r = self._request(
                 "post",
                 self._settings_set_uri,
-                data=json.dumps({"action": "set", "sets": kodi_settings}),
+                data=json.dumps({"action": "set", "sets": merged_settings}),
             )
             if r.status_code != 200:
                 xbmcgui.Dialog().ok(kodi.translate(30102), r.json()["error"])

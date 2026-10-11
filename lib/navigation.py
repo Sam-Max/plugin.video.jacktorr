@@ -62,6 +62,8 @@ from lib.settings import (
     get_buffer_retries,
     get_username,
     show_status_overlay,
+    show_rutor_search,
+    show_torznab_search,
     get_min_candidate_size,
     ask_to_delete_torrent,
     get_files_order,
@@ -152,6 +154,20 @@ def media(func, *args, **kwargs):
     return "PlayMedia({})".format(plugin.url_for(func, *args, **kwargs))
 
 
+def _provider_disabled_hint(server_flag):
+    """Return True only when an empty result list can be traced to a disabled
+    provider on the TorrServer side. A missing, malformed, or unreadable
+    settings payload must not claim the provider is disabled."""
+    try:
+        settings = api.get_settings()
+    except TorrServerError:
+        logging.warning("Search: failed reading TorrServer settings")
+        return False
+    if not isinstance(settings, dict):
+        return False
+    return settings.get(server_flag) is False
+
+
 def query_arg(name, required=True):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -232,18 +248,20 @@ def index():
         api.torr_version
     except Exception:
         notification(translate(30247))
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_results),
-        li(30255, "search.png"),
-        isFolder=True,
-    )    
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(torznab_search_results),
-        li(30261, "search.png"),
-        isFolder=True,
-    )
+    if show_rutor_search():
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(search_results),
+            li(30255, "search.png"),
+            isFolder=True,
+        )
+    if show_torznab_search():
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(torznab_search_results),
+            li(30261, "search.png"),
+            isFolder=True,
+        )
     addDirectoryItem(
         plugin.handle,
         plugin.url_for(dialog_insert),
@@ -490,7 +508,10 @@ def search_results(query=None):
     )
     if not results:
         logging.info("Search: no results, showing notification")
-        notification(translate(30253))
+        if _provider_disabled_hint("EnableRutorSearch"):
+            notification(translate(30253))
+        else:
+            notification(translate(30271))
         return
     for r in results:
         magnet = r.get("Magnet", "")
@@ -553,7 +574,10 @@ def torznab_search_results(query=None):
     )
     if not results:
         logging.info("Torznab search: no results, showing notification")
-        notification(translate(30262))
+        if _provider_disabled_hint("EnableTorznabSearch"):
+            notification(translate(30262))
+        else:
+            notification(translate(30271))
         return
     for r in results:
         magnet = r.get("Magnet", "")

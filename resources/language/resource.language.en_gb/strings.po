@@ -373,8 +373,8 @@ msgid "Play"
 msgstr ""
 
 msgctxt "#30255"
-msgid "Search"
-msgstr ""
+msgid "Rutor search"
+msgstr "Rutor search"
 
 msgctxt "#30256"
 msgid "New search"
@@ -423,3 +423,19 @@ msgstr "Music"
 msgctxt "#30267"
 msgid "Other"
 msgstr "Other"
+
+msgctxt "#30268"
+msgid "Show Rutor search"
+msgstr "Show Rutor search"
+
+msgctxt "#30269"
+msgid "Show Torznab search"
+msgstr "Show Torznab search"
+
+msgctxt "#30270"
+msgid "Enable Torznab Search"
+msgstr "Enable Torznab Search"
+
+msgctxt "#30271"
+msgid "No results"
+msgstr "No results"

@@ -27,6 +27,7 @@
 - **Real-time Status**: Optional status overlay showing download speed, active peers, and buffering progress.
 - **Advanced Buffering**: Configurable pre-load cache and buffering timeouts.
 - **Smart File Selection**: Automatically identifies video candidates or lets you choose from multiple files.
+- **Optional Search Menus**: Rutor and Torznab search entries on the main menu can be enabled separately in the addon settings (both disabled by default).
 - **API for Addons**: Simple plugin API allows other Kodi addons to trigger JackTorr playback.
 
 ---
@@ -40,6 +41,14 @@
     - Locate and select the downloaded file.
     
 **NOTE**: JackTorr requires an external [TorrServer](https://github.com/YouROK/TorrServer) instance. It does not include the TorrServer daemon itself. You must configure the server address in the addon settings.
+
+### Search Menu Settings
+
+The main menu **Rutor search** and **Torznab search** entries are hidden by default. Enable **Show Rutor search** / **Show Torznab search** in the addon settings (Playback category) to display them.
+
+Server-side search can be enabled from the addon's **Advanced** category: turn on **Apply settings to TorrServer**, then enable **Enable RutorSearch** and **Enable Torznab Search**. Applying settings keeps every other TorrServer option (including Torznab indexer URLs and keys) and only writes the addon-managed fields. A Kodi restart is needed once after updating the addon so the settings-sync service picks the change up.
+
+When a search returns no results, the addon checks whether the provider is actually enabled on TorrServer: if it is disabled you get a hint to enable it there; otherwise you get a neutral "No results" message.
 
 ---
 

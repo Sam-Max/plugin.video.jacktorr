@@ -68,3 +68,11 @@ def get_files_order():
 
 def hide_subfolder_components():
     return get_boolean_setting("hide_subfolder_components")
+
+
+def show_rutor_search():
+    return get_boolean_setting("show_rutor_search")
+
+
+def show_torznab_search():
+    return get_boolean_setting("show_torznab_search")

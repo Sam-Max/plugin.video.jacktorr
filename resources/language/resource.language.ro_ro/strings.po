@@ -373,8 +373,8 @@ msgid "Play"
 msgstr "Redă"
 
 msgctxt "#30255"
-msgid "Search"
-msgstr "Caută"
+msgid "Rutor search"
+msgstr "Căutare Rutor"
 
 msgctxt "#30256"
 msgid "New search"
@@ -423,3 +423,19 @@ msgstr "Muzică"
 msgctxt "#30267"
 msgid "Other"
 msgstr "Altele"
+
+msgctxt "#30268"
+msgid "Show Rutor search"
+msgstr "Afișează căutarea Rutor"
+
+msgctxt "#30269"
+msgid "Show Torznab search"
+msgstr "Afișează căutarea Torznab"
+
+msgctxt "#30270"
+msgid "Enable Torznab Search"
+msgstr "Activează căutarea Torznab"
+
+msgctxt "#30271"
+msgid "No results"
+msgstr "Niciun rezultat"
