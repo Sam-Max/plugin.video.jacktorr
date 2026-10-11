@@ -11,7 +11,7 @@ are hidden from the listing.
 
 import pytest
 
-from lib.kodi_formats import is_displayable, strip_common_folder_prefix
+from lib.kodi_formats import format_torrent_size, is_displayable, strip_common_folder_prefix
 
 
 def _file_stats(paths):
@@ -138,3 +138,17 @@ class TestIsDisplayable:
     def test_pad_with_path_prefix(self):
         assert not is_displayable("Show.Name/.pad/12345")
         assert not is_displayable(".pad/0")
+
+
+class TestFormatTorrentSize:
+    """format_torrent_size (issue #19): human-readable size, empty when unknown."""
+
+    def test_formats_gigabytes(self):
+        assert format_torrent_size(42930000000) == "42.93GB"
+
+    def test_formats_megabytes(self):
+        assert format_torrent_size(129241752) == "129.24MB"
+
+    @pytest.mark.parametrize("value", [None, 0, -1, "", "42", True])
+    def test_returns_empty_string_when_size_is_unknown(self, value):
+        assert format_torrent_size(value) == ""

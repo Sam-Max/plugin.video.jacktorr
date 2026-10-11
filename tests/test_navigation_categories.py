@@ -1,3 +1,4 @@
+import pytest
 import sys
 import types
 from unittest.mock import MagicMock
@@ -283,3 +284,77 @@ def test_torrent_action_deletes_metadata_only_after_confirmed_removal(monkeypatc
     navigation.torrent_action("a" * 40, "remove_torrent")
 
     delete_metadata.assert_called_once_with(navigation.api._base_url, "a" * 40)
+
+
+def _add_torrent_item_with(monkeypatch, torrent):
+    torrent_item = MagicMock()
+    list_item = MagicMock(return_value=torrent_item)
+    monkeypatch.setattr(navigation, "get_display_metadata", lambda *_args: {})
+    monkeypatch.setattr(navigation, "list_item", list_item)
+    monkeypatch.setattr(navigation, "set_info_tag", MagicMock())
+    monkeypatch.setattr(navigation, "addDirectoryItem", MagicMock())
+    monkeypatch.setattr(navigation.plugin, "url_for", MagicMock(return_value="plugin://jacktorr"))
+
+    navigation.add_torrent_item(torrent)
+    return list_item
+
+
+def test_torrent_item_label_includes_torrent_size(monkeypatch):
+    list_item = _add_torrent_item_with(
+        monkeypatch,
+        {"hash": "a" * 40, "title": "Movie", "stat": 0, "torrent_size": 42930000000},
+    )
+
+    list_item.assert_called_once_with("Movie (42.93GB)", "download.png", poster=None)
+
+
+def test_torrent_item_label_has_no_size_when_size_is_unknown(monkeypatch):
+    list_item = _add_torrent_item_with(
+        monkeypatch, {"hash": "a" * 40, "title": "Movie", "stat": 0}
+    )
+
+    list_item.assert_called_once_with("Movie", "download.png", poster=None)
+
+
+def test_check_directory_logs_traceback_at_error_level_when_listing_fails(monkeypatch):
+    kodi_log = MagicMock()
+    end_of_directory = MagicMock()
+    monkeypatch.setattr(navigation, "kodi_log", kodi_log)
+    monkeypatch.setattr(navigation, "endOfDirectory", end_of_directory)
+
+    @navigation.check_directory
+    def failing_listing():
+        raise ValueError("boom in listing")
+
+    with pytest.raises(ValueError):
+        failing_listing()
+
+    end_of_directory.assert_called_once_with(navigation.plugin.handle, succeeded=False)
+    kodi_log.assert_called_once()
+    message, level = kodi_log.call_args.args
+    assert level == navigation.LOGERROR
+    assert "ValueError: boom in listing" in message
+    assert "Traceback" in message
+
+
+def test_torrent_files_label_includes_each_file_size(monkeypatch):
+    file_stats = [
+        {"id": 1, "path": "Show/ep01.mkv", "length": 1609672079},
+        {"id": 2, "path": "Show/ep02.mkv"},
+    ]
+    list_item = MagicMock(return_value=MagicMock())
+    monkeypatch.setattr(navigation.api, "get_torrent_info", lambda **_kwargs: {
+        "title": "Show", "file_stats": file_stats
+    })
+    monkeypatch.setattr(navigation, "get_display_metadata", lambda *_args: {})
+    monkeypatch.setattr(navigation, "list_item", list_item)
+    monkeypatch.setattr(navigation, "set_info_tag", MagicMock())
+    monkeypatch.setattr(navigation, "addDirectoryItem", MagicMock())
+    monkeypatch.setattr(navigation.api, "get_stream_url", lambda **_kwargs: "http://stream")
+    monkeypatch.setattr(navigation.plugin, "url_for", MagicMock(return_value="plugin://jacktorr"))
+    monkeypatch.setattr(navigation, "hide_subfolder_components", lambda: False)
+
+    navigation.torrent_files("a" * 40)
+
+    labels = [c.args[0] for c in list_item.call_args_list]
+    assert labels == ["ep01.mkv (1.61GB)", "ep02.mkv"]

@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import traceback
 from threading import Thread
 import time
 from urllib.parse import parse_qs, urlsplit
@@ -15,6 +16,7 @@ from lib.torrserver.display_metadata import (
 )
 import routing
 from xbmc import Monitor, executebuiltin, getInfoLabel, getCondVisibility, sleep
+from xbmc import LOGERROR, log as kodi_log
 from xbmcgui import ListItem, DialogProgress, Dialog
 from xbmcplugin import addDirectoryItem, endOfDirectory, setResolvedUrl
 
@@ -30,6 +32,7 @@ from lib.buffering import (
 from lib.dialog import DialogInsert
 from lib.episode_matching import match_episode_file
 from lib.kodi import (
+    ADDON_ID,
     ADDON_PATH,
     ADDON_NAME,
     translate,
@@ -46,6 +49,7 @@ from lib.kodi_formats import (
     is_video,
     is_text,
     is_displayable,
+    format_torrent_size,
     strip_common_folder_prefix,
 )
 from lib.player import JackTorrPlayer
@@ -116,6 +120,11 @@ def check_directory(func):
             ret = func(*args, **kwargs)
             succeeded = True
             return ret
+        except Exception:
+            # Kodi only reports "Error getting plugin://..." without the cause;
+            # log the traceback at ERROR level so it shows in kodi.log by default.
+            kodi_log("[{}] {}".format(ADDON_ID, traceback.format_exc()), LOGERROR)
+            raise
         finally:
             endOfDirectory(plugin.handle, succeeded=succeeded)
 
@@ -330,9 +339,11 @@ def add_torrent_item(torrent):
         (translate(30250), action(torrent_action, info_hash, "set_category"))
     )
 
-    torrent_li = list_item(
-        display_title, "download.png", poster=display_poster
-    )
+    # Estuary's default video list layout does not draw Label2, so the size
+    # goes in the label, matching the search results.
+    size_label = format_torrent_size(torrent.get("torrent_size"))
+    list_label = "{} ({})".format(display_title, size_label) if size_label else display_title
+    torrent_li = list_item(list_label, "download.png", poster=display_poster)
     set_info_tag(torrent_li, "video", {"title": display_title, "plot": display_plot})
     torrent_li.addContextMenuItems(context_menu_items)
     addDirectoryItem(
@@ -604,7 +615,9 @@ def torrent_files(info_hash):
         name = f.get("path")
         id = f.get("id")
         serve_url = api.get_stream_url(link=info_hash, path=f.get("path"), file_id=id)
-        file_li = list_item(display_name, "download.png", poster=display_poster)
+        size_label = format_torrent_size(f.get("length"))
+        file_label = "{} ({})".format(display_name, size_label) if size_label else display_name
+        file_li = list_item(file_label, "download.png", poster=display_poster)
         file_li.setPath(serve_url)
 
         context_menu_items = []

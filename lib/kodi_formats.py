@@ -1,3 +1,5 @@
+from lib.utils import sizeof_fmt
+
 video_extensions = (
     '.001', '.3g2', '.3gp', '.asf', '.asx', '.avc', '.avi', '.avs', '.bdm', '.bdmv', '.bin', '.bivx', '.dat', '.divx',
     '.dv', '.dvr-ms', '.evo', '.f4v', '.fli', '.flv', '.h264', '.img', '.iso', '.m2t', '.m2ts', '.m2v', '.m3u8', '.m4v',
@@ -118,3 +120,16 @@ def strip_common_folder_prefix(file_stats, hide_subfolder_components=False):
 
     prefix = "/".join(common) + "/"
     return [p[len(prefix):] if p.startswith(prefix) else p for p in normalized]
+
+
+def format_torrent_size(size_bytes):
+    """Return a human-readable torrent size (e.g. '42.93GB') or '' if unknown.
+
+    TorrServer reports `torrent_size` in bytes. Missing, non-numeric, boolean,
+    zero, or negative values yield an empty string so no size is shown.
+    """
+    if isinstance(size_bytes, bool) or not isinstance(size_bytes, (int, float)):
+        return ""
+    if size_bytes <= 0:
+        return ""
+    return sizeof_fmt(size_bytes)
