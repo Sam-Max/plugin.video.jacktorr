@@ -551,3 +551,23 @@ msgstr "Búsqueda Torznab"
 msgctxt "#30262"
 msgid "No results (check that Torznab search is enabled in TorrServer)"
 msgstr "Sin resultados (comprueba que la búsqueda Torznab esté activada en TorrServer)"
+
+msgctxt "#30263"
+msgid "All Torrents"
+msgstr "Todos los torrents"
+
+msgctxt "#30264"
+msgid "Movies"
+msgstr "Películas"
+
+msgctxt "#30265"
+msgid "Series"
+msgstr "Series"
+
+msgctxt "#30266"
+msgid "Music"
+msgstr "Música"
+
+msgctxt "#30267"
+msgid "Other"
+msgstr "Otros"

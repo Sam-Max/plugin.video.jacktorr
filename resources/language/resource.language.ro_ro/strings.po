@@ -403,3 +403,23 @@ msgstr "Căutare Torznab"
 msgctxt "#30262"
 msgid "No results (check that Torznab search is enabled in TorrServer)"
 msgstr "Niciun rezultat (verificați că căutarea Torznab este activată în TorrServer)"
+
+msgctxt "#30263"
+msgid "All Torrents"
+msgstr "Toate torrentele"
+
+msgctxt "#30264"
+msgid "Movies"
+msgstr "Filme"
+
+msgctxt "#30265"
+msgid "Series"
+msgstr "Seriale"
+
+msgctxt "#30266"
+msgid "Music"
+msgstr "Muzică"
+
+msgctxt "#30267"
+msgid "Other"
+msgstr "Altele"

@@ -100,6 +100,10 @@ routing.Plugin = _Plugin
 from lib import navigation
 
 
+def _translate_listing_strings(string_id):
+    return "All Torrents" if string_id == 30263 else "Uncategorized"
+
+
 def _capture_listing(monkeypatch):
     items = []
     add_directory_item = MagicMock()
@@ -123,12 +127,12 @@ def test_torrents_groups_present_categories_and_keeps_custom_categories(monkeypa
             {"hash": "four", "category": "Anime"},
         ],
     )
-    monkeypatch.setattr(navigation, "translate", lambda string_id: "Uncategorized")
+    monkeypatch.setattr(navigation, "translate", _translate_listing_strings)
     items, _add_directory_item = _capture_listing(monkeypatch)
 
     navigation.torrents()
 
-    assert [label for label, _item in items] == ["Anime", "Movies", "Series"]
+    assert [label for label, _item in items] == ["All Torrents", "Anime", "Movies", "Series"]
 
 
 def test_torrents_groups_invalid_categories_into_uncategorized(monkeypatch):
@@ -143,12 +147,12 @@ def test_torrents_groups_invalid_categories_into_uncategorized(monkeypatch):
             {"hash": "custom", "category": "Custom"},
         ],
     )
-    monkeypatch.setattr(navigation, "translate", lambda string_id: "Uncategorized")
+    monkeypatch.setattr(navigation, "translate", _translate_listing_strings)
     items, _add_directory_item = _capture_listing(monkeypatch)
 
     navigation.torrents()
 
-    assert [label for label, _item in items] == ["Uncategorized", "Custom"]
+    assert [label for label, _item in items] == ["All Torrents", "Uncategorized", "Custom"]
 
 
 def test_category_torrents_filters_content_and_preserves_actions(monkeypatch):
@@ -358,3 +362,70 @@ def test_torrent_files_label_includes_each_file_size(monkeypatch):
 
     labels = [c.args[0] for c in list_item.call_args_list]
     assert labels == ["ep01.mkv (1.61GB)", "ep02.mkv"]
+
+
+def _torrents_listing(monkeypatch, torrent_list):
+    add_directory_item = MagicMock()
+    monkeypatch.setattr(navigation.api, "torrents", lambda: torrent_list)
+    monkeypatch.setattr(navigation, "prune_display_metadata", MagicMock())
+    monkeypatch.setattr(navigation, "translate", lambda string_id: "T{}".format(string_id))
+    monkeypatch.setattr(navigation, "list_item", lambda label, *_args, **_kwargs: label)
+    monkeypatch.setattr(navigation, "addDirectoryItem", add_directory_item)
+    monkeypatch.setattr(navigation.plugin, "url_for", lambda func, **kwargs: func)
+    return add_directory_item
+
+
+def test_torrents_lists_all_torrents_entry_first(monkeypatch):
+    add_directory_item = _torrents_listing(monkeypatch, [
+        {"hash": "a" * 40, "category": "tv"},
+        {"hash": "b" * 40},
+    ])
+
+    navigation.torrents()
+
+    labels = [c.args[2] for c in add_directory_item.call_args_list]
+    urls = [c.args[1] for c in add_directory_item.call_args_list]
+    assert labels[0] == "T30263"
+    assert urls[0] is navigation.all_torrents
+    assert labels[1:] == ["T30260", "T30265"]
+
+
+def test_torrents_hides_all_torrents_entry_when_there_are_no_torrents(monkeypatch):
+    add_directory_item = _torrents_listing(monkeypatch, [])
+
+    navigation.torrents()
+
+    add_directory_item.assert_not_called()
+
+
+def test_all_torrents_lists_every_torrent_including_uncategorized(monkeypatch):
+    torrents_seen = []
+    monkeypatch.setattr(navigation.api, "torrents", lambda: [
+        {"hash": "a" * 40, "category": "tv"},
+        {"hash": "b" * 40},
+    ])
+    monkeypatch.setattr(navigation, "prune_display_metadata", MagicMock())
+    monkeypatch.setattr(navigation, "add_torrent_item", lambda torrent: torrents_seen.append(torrent["hash"]))
+
+    navigation.all_torrents()
+
+    assert torrents_seen == ["a" * 40, "b" * 40]
+
+
+def test_torrents_translates_torrserver_category_labels(monkeypatch):
+    monkeypatch.setattr(navigation.api, "torrents", lambda: [
+        {"hash": "a", "category": "movie"},
+        {"hash": "b", "category": "tv"},
+        {"hash": "c", "category": "music"},
+        {"hash": "d", "category": "other"},
+        {"hash": "e", "category": "Custom"},
+    ])
+    monkeypatch.setattr(navigation, "prune_display_metadata", MagicMock())
+    monkeypatch.setattr(navigation, "translate", lambda string_id: "T{}".format(string_id))
+    items, _add_directory_item = _capture_listing(monkeypatch)
+
+    navigation.torrents()
+
+    assert [label for label, _item in items] == [
+        "T30263", "Custom", "T30264", "T30266", "T30267", "T30265",
+    ]

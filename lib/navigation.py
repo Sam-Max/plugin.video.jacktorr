@@ -262,9 +262,16 @@ def index():
 def torrents():
     torrent_list = api.torrents()
     prune_display_metadata(api._base_url)
+    if torrent_list:
+        addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(all_torrents),
+            list_item(translate(30263), "torrents.png"),
+            isFolder=True,
+        )
     categories = {torrent_category(torrent) for torrent in torrent_list}
     for category in sorted(categories, key=lambda value: (value is not None, value or "")):
-        label = category if category is not None else translate(30260)
+        label = category_label(category)
         if category is None:
             url = plugin.url_for(uncategorized_torrents)
         else:
@@ -284,10 +291,35 @@ def category_torrents(category):
     list_category_torrents(category)
 
 
+@plugin.route("/torrents/all")
+@check_directory
+def all_torrents():
+    torrent_list = api.torrents()
+    prune_display_metadata(api._base_url)
+    for torrent in torrent_list:
+        add_torrent_item(torrent)
+
+
 @plugin.route("/torrents/uncategorized")
 @check_directory
 def uncategorized_torrents():
     list_category_torrents(None)
+
+
+# TorrServer's built-in categories; the web UI shows them translated.
+TORRSERVER_CATEGORY_STRING_IDS = {
+    "movie": 30264,
+    "tv": 30265,
+    "music": 30266,
+    "other": 30267,
+}
+
+
+def category_label(category):
+    if category is None:
+        return translate(30260)
+    string_id = TORRSERVER_CATEGORY_STRING_IDS.get(category)
+    return translate(string_id) if string_id else category
 
 
 def torrent_category(torrent):
