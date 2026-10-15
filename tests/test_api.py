@@ -35,6 +35,21 @@ def torrserver():
     )
 
 
+class TestSubtitleRequestTimeouts:
+    def test_torrent_info_timeout_is_opt_in(self, torrserver):
+        expected = {"name": "Movie"}
+        torrserver._session.request.return_value = _make_response(expected)
+        assert torrserver.get_torrent_info("abc") == expected
+        assert "timeout" not in torrserver._session.request.call_args.kwargs
+        assert torrserver.get_torrent_info("abc", timeout=5) == expected
+        assert torrserver._session.request.call_args.kwargs["timeout"] == 5
+
+    def test_playlist_has_a_short_timeout(self, torrserver):
+        torrserver._session.request.return_value = _make_response({}, text="#EXTM3U")
+        assert torrserver.get_playlist("Movie", "abc", 1) == "#EXTM3U"
+        assert torrserver._session.request.call_args.kwargs["timeout"] == 5
+
+
 class TestParseJsonResponse:
     """Tests for TorrServer._parse_json_response."""
 

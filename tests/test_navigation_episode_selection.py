@@ -100,6 +100,8 @@ class _Plugin:
 
 routing.Plugin = _Plugin
 
+import pytest
+
 from lib import navigation
 
 
@@ -199,6 +201,7 @@ def test_play_url_forwards_episode_metadata_to_play_info_hash(monkeypatch):
 
 
 def test_play_uses_metadata_for_list_item_and_video_info_tag(monkeypatch):
+    monkeypatch.setattr(navigation, "get_external_subtitles", lambda *_args: [])
     item = MagicMock()
     tag = MagicMock()
     item.getVideoInfoTag.return_value = tag
@@ -226,6 +229,44 @@ def test_play_uses_metadata_for_list_item_and_video_info_tag(monkeypatch):
     item.setArt.assert_called_once_with({"poster": "poster.jpg"})
     tag.setTitle.assert_called_once_with("Localized title")
     tag.setPlot.assert_called_once_with("Localized description")
+
+
+@pytest.mark.parametrize("failed_endpoint", ["info", "playlist", None])
+def test_play_resolves_when_subtitle_requests_timeout(monkeypatch, failed_endpoint):
+    from requests.exceptions import Timeout
+
+    item = MagicMock()
+    player = MagicMock()
+    player.__enter__.return_value = player
+    resolved = MagicMock()
+    subtitle = "http://server/Movie.srt?index=2"
+    info = MagicMock(return_value={"name": "Movie"})
+    playlist = MagicMock(return_value=(
+        "#EXTM3U\n#EXTVLCOPT:input-slave=" + subtitle
+        + "#\nhttp://server/Movie.mkv?index=1\n"
+    ))
+    if failed_endpoint == "info":
+        info.side_effect = Timeout("subtitle metadata timed out")
+    elif failed_endpoint == "playlist":
+        playlist.side_effect = Timeout("subtitle playlist timed out")
+    monkeypatch.setattr(navigation.api, "get_torrent_info", info)
+    monkeypatch.setattr(navigation.api, "get_playlist", playlist)
+    monkeypatch.setattr(navigation.api, "get_stream_url", lambda **_kwargs: "http://video")
+    monkeypatch.setattr(navigation, "ListItem", MagicMock(return_value=item))
+    monkeypatch.setattr(navigation, "JackTorrPlayer", MagicMock(return_value=player))
+    monkeypatch.setattr(navigation, "show_status_overlay", lambda: False)
+    monkeypatch.setattr(navigation, "setResolvedUrl", resolved)
+
+    navigation.play(info_hash="abc", file_id=1, path="Movie.mkv")
+
+    info.assert_called_once_with("abc", timeout=5)
+    resolved.assert_called_once_with(navigation.plugin.handle, True, item)
+    if failed_endpoint:
+        item.setSubtitles.assert_not_called()
+    else:
+        item.setSubtitles.assert_called_once_with([subtitle])
+    if failed_endpoint == "info":
+        playlist.assert_not_called()
 
 
 def _run_play_info_hash(monkeypatch, files, dialog_index=0, **metadata):
