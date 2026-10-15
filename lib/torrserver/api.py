@@ -189,10 +189,11 @@ class TorrServer(object):
             "/torrents",
         )
 
-    def get_torrent_info(self, link):
-        """read extended info of one torrent"""
+    def get_torrent_info(self, link, *, timeout=None):
+        """Read extended info, optionally bounding connect/read inactivity."""
+        kwargs = {} if timeout is None else {"timeout": timeout}
         return self._parse_json_response(
-            self._get("/stream", params={"link": link, "stat": "true"}),
+            self._get("/stream", params={"link": link, "stat": "true"}, **kwargs),
             "/stream",
         )
 
@@ -249,6 +250,20 @@ class TorrServer(object):
     def get_stream_url(self, link, path, file_id):
         """returns the stream url"""
         return f"{self._base_url}/stream/{quote(path)}?link={link}&index={file_id}&play"
+
+    def get_playlist(self, name, link, file_id):
+        # Optional subtitle discovery must not wait indefinitely for a response.
+        response = self._get(
+            "/playlist/{}.m3u".format(quote(name, safe="")),
+            params={"hash": link, "index": file_id},
+            timeout=5,
+        )
+        if response.status_code != 200:
+            raise TorrServerError(
+                "TorrServer /playlist returned HTTP {}".format(response.status_code),
+                status_code=response.status_code,
+            )
+        return response.text
 
     def get_settings(self):
         res = self._post("/settings", data=dumps({"action": "get"}))
