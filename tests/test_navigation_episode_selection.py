@@ -231,8 +231,8 @@ def test_play_uses_metadata_for_list_item_and_video_info_tag(monkeypatch):
     tag.setPlot.assert_called_once_with("Localized description")
 
 
-@pytest.mark.parametrize("failed_endpoint", ["info", "playlist", None])
-def test_play_resolves_when_subtitle_requests_timeout(monkeypatch, failed_endpoint):
+@pytest.mark.parametrize("playlist_fails", [False, True])
+def test_play_resolves_when_subtitle_discovery_fails(monkeypatch, playlist_fails):
     from requests.exceptions import Timeout
 
     item = MagicMock()
@@ -240,14 +240,12 @@ def test_play_resolves_when_subtitle_requests_timeout(monkeypatch, failed_endpoi
     player.__enter__.return_value = player
     resolved = MagicMock()
     subtitle = "http://server/Movie.srt?index=2"
-    info = MagicMock(return_value={"name": "Movie"})
+    info = MagicMock()
     playlist = MagicMock(return_value=(
         "#EXTM3U\n#EXTVLCOPT:input-slave=" + subtitle
         + "#\nhttp://server/Movie.mkv?index=1\n"
     ))
-    if failed_endpoint == "info":
-        info.side_effect = Timeout("subtitle metadata timed out")
-    elif failed_endpoint == "playlist":
+    if playlist_fails:
         playlist.side_effect = Timeout("subtitle playlist timed out")
     monkeypatch.setattr(navigation.api, "get_torrent_info", info)
     monkeypatch.setattr(navigation.api, "get_playlist", playlist)
@@ -259,14 +257,14 @@ def test_play_resolves_when_subtitle_requests_timeout(monkeypatch, failed_endpoi
 
     navigation.play(info_hash="abc", file_id=1, path="Movie.mkv")
 
-    info.assert_called_once_with("abc", timeout=5)
+    # Subtitles must not cost an extra metadata request on every playback.
+    info.assert_not_called()
+    playlist.assert_called_once_with("abc", 1)
     resolved.assert_called_once_with(navigation.plugin.handle, True, item)
-    if failed_endpoint:
+    if playlist_fails:
         item.setSubtitles.assert_not_called()
     else:
         item.setSubtitles.assert_called_once_with([subtitle])
-    if failed_endpoint == "info":
-        playlist.assert_not_called()
 
 
 class TestParseM3uSubtitles:

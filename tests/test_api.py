@@ -8,6 +8,7 @@ import json
 from unittest.mock import MagicMock, patch, mock_open
 
 import pytest
+import requests
 
 from lib.torrserver.api import TorrServer, TorrServerError
 
@@ -18,6 +19,34 @@ def _make_response(json_data, status_code=200, text=None):
     response.json.return_value = json_data
     response.status_code = status_code
     response.text = text or json.dumps(json_data)
+    return response
+
+
+def _playlist_response(body, status_code=200):
+    """A real response shaped like TorrServer's: an m3u with no charset."""
+    response = requests.models.Response()
+    response.status_code = status_code
+    response._content = body
+    response.headers["Content-Type"] = "audio/x-mpegurl"
+    return response
+
+
+class _ResponseWithoutText(requests.models.Response):
+    """A response that fails loudly when its charset is guessed from the body."""
+
+    @property
+    def text(self):
+        raise AssertionError(
+            "get_playlist must decode response.content instead of reading response.text, "
+            "because charset detection logs at TRACE and KodiLogHandler cannot map it"
+        )
+
+
+def _playlist_response_without_text(body, status_code=200):
+    response = _ResponseWithoutText()
+    response.status_code = status_code
+    response._content = body
+    response.headers["Content-Type"] = "audio/x-mpegurl"
     return response
 
 
@@ -35,19 +64,52 @@ def torrserver():
     )
 
 
-class TestSubtitleRequestTimeouts:
-    def test_torrent_info_timeout_is_opt_in(self, torrserver):
+class TestGetPlaylist:
+    """TorrServer builds the playlist from the hash, so no name is sent."""
+
+    def test_requests_the_bare_playlist_route(self, torrserver):
+        torrserver._session.request.return_value = _playlist_response(b"#EXTM3U\n")
+
+        assert torrserver.get_playlist("abc", 1) == "#EXTM3U\n"
+
+        args, kwargs = torrserver._session.request.call_args
+        assert args[1].endswith("/playlist")
+        assert kwargs["params"] == {"hash": "abc", "index": 1}
+        # Subtitle discovery runs before playback resolves, so it stays short.
+        assert kwargs["timeout"] == 5
+
+    def test_decodes_utf8_without_guessing_a_charset(self, torrserver):
+        body = (
+            "#EXTM3U\n#EXTVLCOPT:input-slave="
+            "http://h:8090/stream/Película.español.srt?link=abc&index=3&play#\n"
+        ).encode("utf-8")
+        torrserver._session.request.return_value = _playlist_response_without_text(body)
+
+        assert torrserver.get_playlist("abc", 1) == body.decode("utf-8")
+
+    def test_replaces_bytes_that_are_not_utf8(self, torrserver):
+        torrserver._session.request.return_value = _playlist_response(
+            b"#EXTM3U\n\xff\xfe broken\n"
+        )
+
+        assert torrserver.get_playlist("abc", 1) == "#EXTM3U\n\ufffd\ufffd broken\n"
+
+    def test_reports_a_rejected_request(self, torrserver):
+        torrserver._session.request.return_value = _playlist_response(b"nope", status_code=404)
+
+        with pytest.raises(TorrServerError) as error:
+            torrserver.get_playlist("abc", 1)
+
+        assert error.value.status_code == 404
+
+
+class TestTorrentInfoRequest:
+    def test_keeps_its_unbounded_match_request(self, torrserver):
         expected = {"name": "Movie"}
         torrserver._session.request.return_value = _make_response(expected)
+
         assert torrserver.get_torrent_info("abc") == expected
         assert "timeout" not in torrserver._session.request.call_args.kwargs
-        assert torrserver.get_torrent_info("abc", timeout=5) == expected
-        assert torrserver._session.request.call_args.kwargs["timeout"] == 5
-
-    def test_playlist_has_a_short_timeout(self, torrserver):
-        torrserver._session.request.return_value = _make_response({}, text="#EXTM3U")
-        assert torrserver.get_playlist("Movie", "abc", 1) == "#EXTM3U"
-        assert torrserver._session.request.call_args.kwargs["timeout"] == 5
 
 
 class TestParseJsonResponse:
