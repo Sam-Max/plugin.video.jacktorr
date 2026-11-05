@@ -4,6 +4,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from urllib.parse import quote
 
+# Subtitle discovery runs before playback resolves, so its request stays short.
+# It deliberately does not reuse metadata_timeout, which defaults to 30 seconds.
+SUBTITLE_PLAYLIST_TIMEOUT = 5
+
 
 class TorrServer(object):
     def __init__(self, host, port, username, password, ssl_enabled=False, session=None):
@@ -249,6 +253,26 @@ class TorrServer(object):
     def get_stream_url(self, link, path, file_id):
         """returns the stream url"""
         return f"{self._base_url}/stream/{quote(path)}?link={link}&index={file_id}&play"
+
+    def get_playlist(self, link, file_id):
+        """Return the m3u playlist TorrServer builds for a torrent.
+
+        TorrServer resolves the torrent from the hash alone and only uses an
+        optional path name as the download filename, so none is sent.
+        """
+        response = self._get(
+            "/playlist",
+            params={"hash": link, "index": file_id},
+            timeout=SUBTITLE_PLAYLIST_TIMEOUT,
+        )
+        if response.status_code != 200:
+            raise TorrServerError(
+                "TorrServer /playlist returned HTTP {}".format(response.status_code),
+                status_code=response.status_code,
+            )
+        # The body carries no charset, so reading .text would run charset
+        # detection, which logs at TRACE: a level KodiLogHandler cannot map.
+        return response.content.decode("utf-8", errors="replace")
 
     def get_settings(self):
         res = self._post("/settings", data=dumps({"action": "get"}))

@@ -1060,6 +1060,46 @@ def wait_for_buffering_completion(info_hash, file_id):
         progress.close()
 
 
+# Formats Kodi can open from a single stream URL. Deliberately narrower than
+# lib.kodi_formats.subtitle_extensions: that list answers "is this file a
+# subtitle?", while a playlist entry must also parse without a companion file.
+# TorrServer lists a torrent's namesakes, so a VobSub .idx index arrives with no
+# .sub bitmap next to it and neither half opens on its own.
+SUBTITLE_EXTENSIONS = (".srt", ".ass", ".ssa", ".smi", ".vtt")
+
+
+def parse_m3u_subtitles(text, file_id):
+    # Return the #EXTVLCOPT:input-slave subtitle URLs of the entry for file_id
+    subtitles = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if line.startswith("#EXTVLCOPT:input-slave="):
+            for u in line[len("#EXTVLCOPT:input-slave="):].split("#"):
+                # Skip empty parts and anything that is not a subtitle file
+                if u and urlsplit(u).path.lower().endswith(SUBTITLE_EXTENSIONS):
+                    subtitles.append(u)
+        elif line and not line.startswith("#"):
+            match = re.search(r"[?&]index=(\d+)", line)
+            if match and match.group(1) == str(file_id):
+                return subtitles
+            subtitles = []
+    return []
+
+
+def get_external_subtitles(info_hash, file_id):
+    # TorrServer lists a torrent's external subtitles in the m3u playlist it
+    # builds, and resolves that playlist from the hash alone.
+    try:
+        return parse_m3u_subtitles(api.get_playlist(info_hash, file_id), file_id)
+    except Exception as e:
+        # Optional subtitles never block playback; the message keeps the reason so
+        # a silent regression stays diagnosable in kodi.log.
+        logging.warning(
+            "Could not read subtitles from TorrServer playlist: %s", e
+        )
+    return []
+
+
 @plugin.route("/play")
 @query_arg("info_hash")
 @query_arg("file_id")
@@ -1069,17 +1109,23 @@ def wait_for_buffering_completion(info_hash, file_id):
 def play(info_hash, file_id, path, poster="", title="", description=""):
     name = path
     serve_url = api.get_stream_url(link=info_hash, path=name, file_id=file_id)
-    item = ListItem(title or name, path=serve_url)
+    # Always set a title, otherwise Kodi names the item after the plugin route.
+    display_title = title or os.path.basename(name.replace("\\", "/"))
+    item = ListItem(display_title, path=serve_url)
     if poster:
         item.setArt({"poster": poster})
-    if title or description:
-        set_info_tag(item, "video", {"title": title or name, "plot": description})
+    set_info_tag(item, "video", {"title": display_title, "plot": description})
 
     # Prevent Kodi's synchronous pre-playback external-subtitle scan from opening
     # the TorrServer stream URL. Kodi's GetParentPath keeps the ?link=&index= query,
     # so the "directory" scan resolves to the media itself and stalls playback.
     # Workaround for xbmc/xbmc#28490 (regression from xbmc/xbmc#28275).
     item.setProperty("no-ext-subs-scan", "true")
+
+    # Attach the external subtitles listed in TorrServer m3u playlist
+    subtitle_urls = get_external_subtitles(info_hash, file_id)
+    if subtitle_urls:
+        item.setSubtitles(subtitle_urls)
     setResolvedUrl(plugin.handle, True, item)
 
     try:
