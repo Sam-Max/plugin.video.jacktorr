@@ -269,6 +269,86 @@ def test_play_resolves_when_subtitle_requests_timeout(monkeypatch, failed_endpoi
         playlist.assert_not_called()
 
 
+class TestParseM3uSubtitles:
+    """parse_m3u_subtitles reads the subtitle URLs belonging to the played file."""
+
+    @staticmethod
+    def _playlist(*entries):
+        return "#EXTM3U\n" + "".join(entries)
+
+    def test_returns_the_input_slave_urls_of_the_matching_entry(self):
+        playlist = self._playlist(
+            "#EXTINF:0,Movie.mkv\n"
+            "#EXTVLCOPT:input-slave="
+            "http://h:8090/stream/Movie.rus.srt?link=abc&index=3&play#"
+            "http://h:8090/stream/Movie.eng.ass?link=abc&index=4&play#\n"
+            "http://h:8090/stream/Movie.mkv?link=abc&index=1&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 1) == [
+            "http://h:8090/stream/Movie.rus.srt?link=abc&index=3&play",
+            "http://h:8090/stream/Movie.eng.ass?link=abc&index=4&play",
+        ]
+
+    def test_returns_nothing_for_a_file_without_subtitles(self):
+        playlist = self._playlist(
+            "#EXTINF:0,E01.mkv\n"
+            "#EXTVLCOPT:input-slave=http://h:8090/stream/E01.srt?link=abc&index=3&play#\n"
+            "http://h:8090/stream/E01.mkv?link=abc&index=1&play\n"
+            "#EXTINF:0,E02.mkv\n"
+            "http://h:8090/stream/E02.mkv?link=abc&index=2&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 2) == []
+
+    def test_does_not_leak_subtitles_between_entries(self):
+        playlist = self._playlist(
+            "#EXTINF:0,E01.mkv\n"
+            "#EXTVLCOPT:input-slave=http://h:8090/stream/E01.srt?link=abc&index=3&play#\n"
+            "http://h:8090/stream/E01.mkv?link=abc&index=1&play\n"
+            "#EXTINF:0,E02.mkv\n"
+            "#EXTVLCOPT:input-slave=http://h:8090/stream/E02.srt?link=abc&index=6&play#\n"
+            "http://h:8090/stream/E02.mkv?link=abc&index=4&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 4) == [
+            "http://h:8090/stream/E02.srt?link=abc&index=6&play"
+        ]
+
+    def test_accepts_an_unterminated_input_slave_value(self):
+        playlist = self._playlist(
+            "#EXTINF:0,Movie.mkv\n"
+            "#EXTVLCOPT:input-slave=http://h:8090/stream/Movie.srt?link=abc&index=3&play\n"
+            "http://h:8090/stream/Movie.mkv?link=abc&index=1&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 1) == [
+            "http://h:8090/stream/Movie.srt?link=abc&index=3&play"
+        ]
+
+    def test_skips_namesakes_that_are_not_subtitle_files(self):
+        playlist = self._playlist(
+            "#EXTINF:0,Movie.mkv\n"
+            "#EXTVLCOPT:input-slave=http://h:8090/stream/Movie.nfo?link=abc&index=2&play#\n"
+            "http://h:8090/stream/Movie.mkv?link=abc&index=1&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 1) == []
+
+    def test_skips_vobsub_because_kodi_needs_both_files_together(self):
+        # TorrServer lists the .idx index and the .sub bitmap as two separate
+        # stream URLs, and neither half opens on its own.
+        playlist = self._playlist(
+            "#EXTINF:0,Movie.mkv\n"
+            "#EXTVLCOPT:input-slave="
+            "http://h:8090/stream/Movie.idx?link=abc&index=5&play#"
+            "http://h:8090/stream/Movie.sub?link=abc&index=6&play#\n"
+            "http://h:8090/stream/Movie.mkv?link=abc&index=1&play\n"
+        )
+
+        assert navigation.parse_m3u_subtitles(playlist, 1) == []
+
+
 def _run_play_info_hash(monkeypatch, files, dialog_index=0, **metadata):
     info = {"file_stats": files, "title": "Show Season 1"}
     api = navigation.api

@@ -1036,8 +1036,12 @@ def wait_for_buffering_completion(info_hash, file_id):
         progress.close()
 
 
-# Only these formats are accepted from the playlist input-slave entries
-SUBTITLE_EXTENSIONS = (".srt", ".ass", ".ssa", ".smi", ".vtt", ".idx")
+# Formats Kodi can open from a single stream URL. Deliberately narrower than
+# lib.kodi_formats.subtitle_extensions: that list answers "is this file a
+# subtitle?", while a playlist entry must also parse without a companion file.
+# TorrServer lists a torrent's namesakes, so a VobSub .idx index arrives with no
+# .sub bitmap next to it and neither half opens on its own.
+SUBTITLE_EXTENSIONS = (".srt", ".ass", ".ssa", ".smi", ".vtt")
 
 
 def parse_m3u_subtitles(text, file_id):
